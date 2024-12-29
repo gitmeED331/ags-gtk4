@@ -1,0 +1,181 @@
+import {App, Gtk, Gdk} from "astal/gtk3" // or import {App, Gtk, Gdk} from "astal/gtk4"
+import { execAsync, exec, Astal, bind, GObject } from "astal"
+import { readFile, writeFile, monitorfile, writefileasync, readfileasync } from "astal/io"
+import Hyprland from "gi://AstalHyprland"
+import Battery from "gi://AstalBattery"
+import Bluetooth from "gi://AstalBluetooth"
+import Mpris from "gi://AstalMpris"
+import Notifd from "gi://AstalNotifd"
+import PowerProfiles from "gi://AstalPowerProfiles"
+import Tray from "gi://AstalTray"
+
+// new Gtk4 inline css
+function Styled({ child, children = [], css }) {
+  const c = // generate a unique class
+  App.apply_css(`${c} { ${css} }`)
+  return <box cssClasses={[c]}>
+    {child || children}
+  </box>
+}
+
+<Styled css="color: red;">
+  <label label="label" />
+</Styled>
+
+function Component({ color = "red" }) {
+  const className = // if you need this to be unique generate an id, otherwise just give it a name
+  App.apply_css(`.${className} { color: ${color}; }`)
+
+  return <box cssClasses={[className]} />
+}
+// ----------------
+
+ellipsize={Pango.EllipsizeMode.END}
+
+transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT}
+
+valign={Gtk.Align.CENTER}
+halign={Gtk.Align.CENTER}
+
+/* window parameters */
+
+anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.BOTTOM | Astal.WindowAnchor.LEFT | Astal.WindowAnchor.RIGHT}
+layer={Astal.Layer.OVERLAY}
+exclusivity={Astal.Exclusivity.NORMAL}
+keymode={Astal.Keymode.NONE}
+visible={false}
+application={App}
+
+/* end window parameters */
+
+hyprctl binds -j
+
+ onScroll={(_, { delta_y }) => {
+  if (delta_y < 0) {
+    Speaker?.set_volume(Speaker.volume + 0.05);
+    Speaker?.set_mute(false);
+  } else {
+    Speaker?.set_volume(Speaker.volume - 0.05);
+    Speaker?.set_mute(false);
+  }
+}}
+
+const win = App.get_window("overview");
+    if (win) { win.visible = !win.visible; }
+
+function ClientWidget(client: Hyprland.Client) {
+    return <box>
+        <label label={bind(client, "title")} />
+        <icon icon={bind(client, "class").as(someFnToCheckIfItsValidIcon)} />
+    </box>
+}
+
+function Taskbar() {
+    return <box>
+        {bind(hyprland, "clients").as(cs => cs.map(ClientWidget))}
+    </box>
+}
+
+visible = { bind(hyprland, "focusedClient").as(Boolean) }
+
+import workspaceEvents from './workspaceEvents';
+
+function onWorkspaceChange() {
+    workspaceEvents.emit('workspace_changed');
+}
+
+// Example: Trigger the event manually
+onWorkspaceChange()
+
+// --- signal handler ---
+function ws(id: number) {
+    const hyprland = Hyprland.get_default();
+    const get = () => hyprland.get_workspace(id) || Hyprland.Workspace.dummy(id, null);
+
+    return Variable(get())
+        .observe(hyprland, "workspace-added", get)
+        .observe(hyprland, "workspace-removed", get);
+}
+// --- end signal handler ---
+
+const sleep = (delay) => new Promise((resolve) => setTimeout(resolve, delay))
+
+const repeatedGreetings = async () => {
+  await sleep(1000)
+  console.log("First")
+  await sleep(1000)
+  console.log("Second")
+  await sleep(1000)
+  console.log("Third")
+}
+
+repeatedGreetings()
+
+onKeyPressEvent={(_, event) => {
+    if (event.get_keyval()[1] === Gdk.KEY_Escape) { App.toggle_window("sessioncontrols") }
+}}
+
+const classname = Variable.derive([bind(stream, "mute")], (isMuted) => {
+  const classList = ["audio-mixer", "item"];
+    if (isMuted) {
+      classList.push("muted");
+    }
+  return classList.join(" ");
+});
+
+@register({ GTypeName: "MyObj" })
+class MyObj extends GObject.Object {
+    @property(String)
+    declare propName: string // default getter/setter with notify signals
+
+    @property(Number)
+    get customProp() {
+        return "value"
+    }
+
+    // defining custom setters requiers manual notify emission
+    set customProp(v: number) {
+        if (v !== this.customProp) {
+            this.notify("custom-prop")
+        }
+    }
+
+    @signal(Number, String)
+    declare someSigh: (a: number, b: string) => void
+
+    @signal(Number, String)
+    defHandler(a: number, b: string) {
+        print("default handler", a, b)
+    }
+}
+
+function eventHandler(eh: number, width: number, height: number) {
+	const eventbox = <eventbox
+		halign={Gtk.Align.FILL}
+		valign={Gtk.Align.FILL}
+		onClick={(_, event) => {
+			const win = App.get_window(WINDOW_NAME);
+			if (event.button === Gdk.BUTTON_PRIMARY) {
+				if (win && win.visible === true) {
+					win.visible = false;
+				}
+			}
+		}}
+		widthRequest={winwidth(width)}
+		heightRequest={winheight(height)}
+	/>;
+	return eventbox;
+}
+
+/* old apptitleticker */
+<box>
+	{bind(hyprland, "focusedClient").as((c) => !c ? (
+		<box>No Client focused</box>
+		) : (
+		<box spacing={5}>
+			<icon valign={Gtk.Align.CENTER} halign={Gtk.Align.CENTER} icon={bind(c, "class").as((i) => Icons(i))} />
+			<label valign={Gtk.Align.CENTER} halign={Gtk.Align.CENTER} hexpand={true} ellipsize={Pango.EllipsizeMode.END} label={bind(c, "title")} />
+		</box>
+		),
+	)}
+</box>

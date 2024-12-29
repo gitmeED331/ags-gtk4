@@ -1,0 +1,10 @@
+@use '_variables' as *;
+@use "components";
+@use "globals";
+
+* {
+	//:not(selection);
+	all: unset;
+	font-family: "Liberation Mono";
+	font-size: 10pt;
+}
