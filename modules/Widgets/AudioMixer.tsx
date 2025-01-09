@@ -3,9 +3,11 @@ import { bind, Binding, execAsync, Variable } from "astal";
 import Icon from "../lib/icons";
 import AstalWp from "gi://AstalWp";
 import { popped } from "./VolumeIndicator";
+import WirePlumber from "gi://Wp";
 
 function AudioElement({ element, type, ...props }: { element: AstalWp.Endpoint; type: "device" | "stream" } & Widget.SliderProps) {
-	const { audio } = AstalWp.get_default()!;
+	const { audio, video } = AstalWp.get_default()!;
+
 	const Bindings = Variable.derive(
 		[
 			bind(element, "volume"),

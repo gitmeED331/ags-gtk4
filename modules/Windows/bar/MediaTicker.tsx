@@ -26,18 +26,25 @@ export const popped = (
 function tickerButton(player: Mpris.Player) {
 	const CustomLabel = ({ info, ...props }: { info: "tracks" | "artists" } & Widget.LabelProps) => {
 		const Bindings = Variable.derive([bind(player, "title"), bind(player, "artist")], (title, artist) => ({
-			label: info === "tracks" ? TrimTrackTitle(title) : artist || "Unknown Artist",
+			label: {
+				tracks: TrimTrackTitle(title),
+				artists: artist || "Unknown Artist",
+			}[info],
 			classname: ["ticker", info],
+			mwc: {
+				tracks: 50,
+				artists: 35,
+			}[info],
 		}))();
 
 		return (
 			<label
-				cssClasses={Bindings.as((b) => b.classname)}
-				label={Bindings.as((b) => b.label)}
+				cssClasses={bind(Bindings).as((b) => b.classname)}
+				label={bind(Bindings).as((b) => b.label)}
 				hexpand
 				wrap
 				wrapMode={Pango.WrapMode.WORD}
-				// maxWidthChars={35}
+				maxWidthChars={bind(Bindings).as((m) => m.mwc)}
 				ellipsize={Pango.EllipsizeMode.END}
 				halign={CENTER}
 				valign={CENTER}

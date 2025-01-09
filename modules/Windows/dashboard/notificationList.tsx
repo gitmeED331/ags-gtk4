@@ -77,7 +77,12 @@ export default function NotificationList() {
 							nitems.sort((a, b) => b.time - a.time);
 						}
 						return nitems.map((nitem) => (
-								<NotifWidget n={nitem} />
+							<NotifWidget
+								n={nitem}
+								onButtonPressed={() => {
+									nitem.dismiss();
+								}}
+							/>
 						));
 					})}
 				</box>

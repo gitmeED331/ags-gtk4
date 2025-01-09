@@ -11,6 +11,7 @@ import playerStack from "./MediaPlayer";
 import PowerProfiles from "./powerprofiles";
 import PrivacyModule from "./PrivacyIndicator";
 import SessionControls from "./SessionControls";
+import SRIndicate from "./screenshot";
 import Tray from "./Tray";
 import VolumeIndicator from "./VolumeIndicator";
 import Wifi from "./Network/WiFi";
@@ -31,5 +32,6 @@ export {
 	BluetoothDevices,
 	PrivacyModule,
 	SessionControls,
+	SRIndicate,
 	Tray,
 };

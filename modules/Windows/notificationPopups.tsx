@@ -6,7 +6,7 @@ import { NotifWidget } from "../Widgets/index";
 const WINDOWNAME = `notifications${App.get_monitors()[0].get_model()}`;
 
 function NotifItem() {
-  const Notif = AstalNotifd.get_default();
+	const Notif = AstalNotifd.get_default();
 	const waitTime = new Variable(3000);
 	const expireTime = new Variable(20000);
 
@@ -14,7 +14,7 @@ function NotifItem() {
 		notificationItem.unparent();
 		expireTime.set(0);
 		waitTime.set(0);
-    Notif.notify
+		// Notif.notify;
 
 		const win = App.get_window(WINDOWNAME);
 		if (win && !box.get_first_child()) {
@@ -25,18 +25,16 @@ function NotifItem() {
 	const popupBox = (<box vertical={true} spacing={10} hexpand={false} vexpand valign={START} halign={END} />) as Gtk.Box;
 
 	Notif.connect("notified", (_, id) => {
-	  if (
-      Notif.dont_disturb &&
-      Notif.get_notification(id).urgency != AstalNotifd.Urgency.CRITICAL
-  ) {
-    return;
-  }
+		if (Notif.dont_disturb && Notif.get_notification(id).urgency != AstalNotifd.Urgency.CRITICAL) {
+			return;
+		}
 
 		const notification = Notif.get_notification(id);
 		if (!notification) return;
 
 		const notificationItem = (
-			<button
+			<NotifWidget
+				n={notification}
 				onButtonPressed={(_, event) => {
 					switch (event.get_button()) {
 						case Gdk.BUTTON_PRIMARY:
@@ -51,14 +49,11 @@ function NotifItem() {
 					expireTime.set(0);
 					waitTime.set(0);
 				}}
-        
 				onHoverLeave={() => {
 					waitTime.set(3000);
 					timeout(waitTime.get(), () => removeItem(popupBox, notificationItem));
 				}}
-			>
-				<NotifWidget n={notification} />
-			</button>
+			/>
 		);
 
 		popupBox.append(notificationItem);
@@ -75,7 +70,7 @@ function NotifItem() {
 }
 
 export default (monitor: Gdk.Monitor) => {
-  const Notif = AstalNotifd.get_default();
+	const Notif = AstalNotifd.get_default();
 
 	Notif.connect("notified", () => {
 		const win = App.get_window(WINDOWNAME);
@@ -85,11 +80,9 @@ export default (monitor: Gdk.Monitor) => {
 		}
 	});
 
-return (	
-<window name={WINDOWNAME} cssClasses={["notifications", "notif"]} hexpand={false} vexpand	application={App}
-widthRequest={450} anchor={TOP | RIGHT} layer={OVERLAY_LAYER} gdkmonitor={monitor}
->
-		<NotifItem />
-	</window>
-)
+	return (
+		<window name={WINDOWNAME} cssClasses={["notifications", "notif"]} hexpand={false} vexpand application={App} widthRequest={450} anchor={TOP | RIGHT} layer={OVERLAY_LAYER} gdkmonitor={monitor}>
+			<NotifItem />
+		</window>
+	);
 };

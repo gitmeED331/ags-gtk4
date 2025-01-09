@@ -81,7 +81,7 @@ export default function (monitor: Gdk.Monitor) {
 			halign={FILL}
 			valign={START}
 		>
-			<centerbox cssClasses={["bar"]} valign={FILL} halign={FILL} baselinePosition={Gtk.BaselinePosition.CENTER} shrinkCenterLast>
+			<centerbox cssClasses={["bar"]} valign={FILL} halign={FILL}>
 				<LeftBar />
 				<CenterBar />
 				<RightBar />

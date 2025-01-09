@@ -79,8 +79,8 @@ function Player(player: Mpris.Player) {
 		const Labels = ({ action, ...props }: { action: "length" | "position" } & Widget.LabelProps) => {
 			const Bindings = Variable.derive([bind(player, "length"), bind(player, "position")], (length, position) => ({
 				classname: {
-					length: "tracklength",
-					position: "trackposition",
+					length: ["tracklength"],
+					position: ["trackposition"],
 				}[action],
 
 				label: {
@@ -91,8 +91,8 @@ function Player(player: Mpris.Player) {
 
 			return (
 				<label
-					cssClasses={[Bindings.as((b) => b.classname).get()]}
-					label={Bindings.as((b) => b.label)}
+					cssClasses={bind(Bindings).as((b) => b.classname)}
+					label={bind(Bindings).as((b) => b.label)}
 					hexpand
 					wrap={false}
 					// maxWidthChars={35}
@@ -121,20 +121,25 @@ function Player(player: Mpris.Player) {
 			(playbackStatus, entry, identity, can_go_previous, can_play, can_go_next) => ({
 				command: {
 					activePlay: () => {
-						// const dwin = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
-						console.log("button: ", player.entry);
-						execAsync(player.entry);
-						// if (dwin && dwin.visible === true) {
-						// 	dwin.visible = false;
-						// } else if (popped && popped.visible) {
-						// 	popped.popdown();
-						// }
+						const dwin = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
+						execAsync(`bash -c '${player.entry}'`);
+						if (dwin && dwin.visible === true) {
+							dwin.visible = false;
+						} else if (popped && popped.visible) {
+							popped.popdown();
+						}
 					},
-					play_pause: () => player.play_pause(),
-					next: () => player.next(),
-					previous: () => player.previous(),
+					play_pause: () => {
+						return player.play_pause();
+					},
+					next: () => {
+						return player.next();
+					},
+					previous: () => {
+						return player.previous();
+					},
 					close: () => {
-						execAsync(`bash -c 'pkill "${player.entry}"'`);
+						execAsync(`bash -c 'killall "${player.entry}"'`).catch(console.error); // Using killall instead of pkill
 					},
 				}[btn],
 
@@ -170,17 +175,20 @@ function Player(player: Mpris.Player) {
 					close: Icon.mpris.controls.CLOSE,
 				}[btn],
 			}),
-		)();
+		);
 
 		return (
 			<button
 				cssClasses={bind(Bindings).as((b) => b.classname)}
 				tooltip_text={bind(Bindings).as((b) => b.tooltip_text)}
 				visible={bind(Bindings).as((b) => b.visible)}
-				onButtonReleased={() => Bindings.get().command()}
-				onDestroy={(self) => {
-					self.unparent();
+				onButtonPressed={(_, event) => {
+					const command = Bindings.get().command;
+					if (command) command();
 				}}
+				// onDestroy={(self) => {
+				// 	self.unparent();
+				// }}
 				{...props}
 			>
 				<image iconName={bind(Bindings).as((b) => b.icon)} />
