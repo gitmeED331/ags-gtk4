@@ -1,4 +1,4 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 .network {
 	&.barbutton {
@@ -6,6 +6,17 @@
 
 		&:hover {
 			color: $color5;
+		}
+		&-tooltip {
+			font-size: 1rem;
+
+			.titles {
+				font-weight: bold;
+			}
+
+			.values {
+				color: $color2;
+			}
 		}
 	}
 
@@ -106,16 +117,22 @@
 			border-left: $border;
 			padding: 0 0.5rem;
 			box-shadow: -0.75rem 0 0.35rem -0.25rem rgba(15, 155, 255, 0.8);
-
-			icon {
+			image {
 				font-size: 1rem;
 			}
 
 			button {
 				all: unset;
 
-				&:hover icon {
+				&:hover image {
 					color: $color4;
+				}
+				&.spinner {
+					color: $color3;
+
+					image {
+						animation: spin 1s infinite linear;
+					}
 				}
 			}
 		}

@@ -2,9 +2,25 @@ import { Gtk, Gdk, App } from "astal/gtk4";
 import { Variable, bind } from "astal";
 import Icon from "../../lib/icons";
 import AstalBluetooth from "gi://AstalBluetooth";
-import { dashboardRightStack } from "../../Windows/dashboard/RightSide";
+import BluetoothDevices from "./BluetoothDevices";
 
 let btreveal = Variable(false);
+const Bluetooth = AstalBluetooth.get_default();
+const btnspace = 30;
+const maxDevs = 5;
+const widheight = Variable.derive([bind(Bluetooth, "devices")], (devs) => (devs.length > 0 ? btnspace * Math.min(maxDevs, devs.length) : 0));
+export const popped = (
+	<popover
+		cssClasses={["popped"]}
+		position={Gtk.PositionType.BOTTOM}
+		hexpand={false}
+		onDestroy={(self) => {
+			self.unparent();
+		}}
+	>
+		<BluetoothDevices heightRequest={bind(widheight).as((p) => p)} widthRequest={350} />
+	</popover>
+) as Gtk.Popover;
 
 const BluetoothWidget = (bluetooth: AstalBluetooth.Bluetooth) => {
 	bluetooth.connect("notify::enabled", (btLabel: Gtk.Label) => {
@@ -47,7 +63,7 @@ export default function BluetoothButton() {
 
 	const tooltip = Variable.derive([bind(Bluetooth, "is_connected"), bind(Bluetooth, "devices")], (is_connected, devices) => {
 		if (is_connected) {
-			const connectedDevices = devices.filter((device: AstalBluetooth.Device) => device.connected).map((device) => device.name);
+			const connectedDevices = devices.filter((device: AstalBluetooth.Device) => device.connected).map((device) => `* ${device.name}`);
 			return connectedDevices.length ? `Connected Devices:\n${connectedDevices.join("\n")}` : "No Devices Connected";
 		}
 		return "No Devices Connected";
@@ -60,24 +76,22 @@ export default function BluetoothButton() {
 			valign={CENTER}
 			tooltip_text={bind(tooltip)}
 			onButtonPressed={(_, event) => {
-				if (event.get_button() === Gdk.BUTTON_PRIMARY) {
-					const dashTab = "bluetooth";
-					const win = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
-					const dashboardTab = dashboardRightStack.get_visible_child_name() === dashTab;
-					const setDashboardTab = dashboardRightStack.set_visible_child_name(dashTab);
-					if (win) {
-						if (win.visible === true && !dashboardTab) {
-							setDashboardTab;
-							// } else if (win.visible === true && dashboardTab) {
-							// 	win.visible = !win.visible;
-						} else {
-							win.visible = !win.visible;
-						}
+				const monitor = App.get_monitors()[0];
+				if (!monitor) return;
+
+				switch (event.get_button()) {
+					case Gdk.BUTTON_PRIMARY: {
+						popped.visible ? popped.popdown() : popped.popup();
+
+						break;
+					}
+					case Gdk.BUTTON_SECONDARY: {
+						btreveal.set(!btreveal.get());
 					}
 				}
-				if (event.get_button() === Gdk.BUTTON_SECONDARY) {
-					btreveal.set(!btreveal.get());
-				}
+			}}
+			setup={(self) => {
+				popped.set_parent(self);
 			}}
 		>
 			{BluetoothWidget(Bluetooth)}

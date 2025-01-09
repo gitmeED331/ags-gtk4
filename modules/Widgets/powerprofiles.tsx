@@ -31,10 +31,16 @@ function PowerProfiles() {
 
 	const SysButton = ({ action, ...props }: { action: "balanced" | "power-saver" | "performance" } & Widget.ButtonProps) => {
 		const Bindings = Variable.derive([bind(powerprofile, "activeProfile"), bind(powerprofile, "get_profiles")], (activeProfile, profiles) => ({
-			cssClasses: {
-				"power-saver": activeProfile === action ? activeProfile : "",
-				balanced: activeProfile === action ? activeProfile : "",
-				performance: activeProfile === action ? activeProfile : "",
+			command: {
+				"power-saver": () => powerprofile.set_active_profile("power-saver"),
+				balanced: () => powerprofile.set_active_profile("balanced"),
+				performance: () => powerprofile.set_active_profile("performance"),
+			}[action],
+
+			classname: {
+				"power-saver": ["powerprofiles", activeProfile === action ? activeProfile : ""],
+				balanced: ["powerprofiles", activeProfile === action ? activeProfile : ""],
+				performance: ["powerprofiles", activeProfile === action ? activeProfile : ""],
 			}[action],
 
 			label: {
@@ -42,26 +48,25 @@ function PowerProfiles() {
 				balanced: "Balanced",
 				performance: "Performance",
 			}[action],
-			command: {
-				"power-saver": () => (powerprofile.activeProfile = "power-saver"),
-				balanced: () => (powerprofile.activeProfile = "balanced"),
-				performance: () => (powerprofile.activeProfile = "performance"),
-			}[action],
+
+
+
 			icon: {
 				"power-saver": Icon.powerprofile["power-saver"],
 				balanced: Icon.powerprofile.balanced,
 				performance: Icon.powerprofile.performance,
 			}[action],
-		}))();
+		}))
+
 		return (
 			<button
-				on_clicked={(_, event) => {
-					if (event.button === Gdk.BUTTON_PRIMARY) {
+				onButtonPressed={(_, event) => {
+					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
 						Bindings.get().command();
 						currentBrightness();
 					}
 				}}
-				cssClasses={[bind(Bindings).as((c) => c.cssClasses).get()]}
+				cssClasses={bind(Bindings).as((c) => c.classname)}
 				{...props}
 			>
 				<box vertical={true}>

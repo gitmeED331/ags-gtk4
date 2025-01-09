@@ -1,17 +1,17 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
-// @keyframes spin {
-// 	to {
-// 		-gtk-icon-transform: rotate(1turn);
-
-// 	}
-// }
+@keyframes spin {
+	to {
+		-gtk-icon-transform: rotate(1turn);
+	}
+}
 
 .refresh {
 	border: 1px solid rgba(0, 0, 0, 0);
 	border-radius: $radius;
 
-	icon {
+	icon,
+	image {
 		border-radius: $radius;
 		font-size: 1rem;
 		// animation: spin 1s linear infinite;
@@ -23,7 +23,8 @@
 	border: 1px solid rgba(0, 0, 0, 0);
 	border-radius: $radius;
 
-	icon {
+	icon,
+	image {
 		// all: unset;
 		font-size: 1rem;
 		color: $color3;
@@ -34,6 +35,8 @@
 }
 
 spinner {
-	color: $color3;
-	animation: spin 1s linear infinite;
+	&:checked {
+		color: $color3;
+		animation: spin 1s linear infinite;
+	}
 }

@@ -1,4 +1,4 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 .hyprworkspaces,
 .riverworkspaces {
@@ -6,17 +6,12 @@
 	border-top: $border;
 	border-radius: 1rem;
 	padding: 0rem 0.5rem;
-	margin-left: 0.5rem;
 
 	.urgent,
 	.occupied,
 	.focused {
 		&:hover {
-
-			icon,
-			label {
-				color: $color5;
-			}
+			color: $color5;
 		}
 	}
 
@@ -25,7 +20,10 @@
 	}
 
 	.occupied {
-		color: rgba(15, 155, 255, 1);
+		image,
+		label {
+			color: rgba(15, 155, 255, 1);
+		}
 	}
 
 	.active {
@@ -43,9 +41,7 @@
 		@each $workspace in hyprworkspaces, riverworkspaces {
 			@if $workspace ==hyprworkspaces {
 				background-image: radial-gradient(circle at center, rgba(0, 0, 0, 1), $color1 1.5rem);
-			}
-
-			@else if $workspace ==riverworkspaces {
+			} @else if $workspace ==riverworkspaces {
 				border-bottom: 1px solid $color2;
 			}
 		}
@@ -54,11 +50,11 @@
 	button {
 		color: $color1;
 		transition: all 2s cubic-bezier(0.5, 2, 0, 1);
-
-		icon {
-			font-size: 0.8rem;
+		image {
+			.large-icons {
+				font-size: 0.8rem;
+			}
 		}
-
 		label {
 			font-size: 0.9rem;
 		}
@@ -76,7 +72,7 @@
 		}
 
 		&:hover {
-			icon {
+			image {
 				animation: spin 1s linear infinite;
 				color: $color5;
 			}

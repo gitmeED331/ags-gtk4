@@ -1,6 +1,7 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 // ---- Ticker ----
+
 .ticker {
 	&.container {
 		border-top: $border;
@@ -83,7 +84,6 @@
 }
 
 .track {
-
 	&position,
 	&length {
 		color: $color1;
@@ -126,7 +126,7 @@
 	color: #cdd6f4;
 	border: 2px solid transparent;
 
-	icon {
+	image {
 		font-size: 1.25rem;
 	}
 
@@ -167,7 +167,7 @@
 	}
 
 	&.close {
-		margin-right: -0.3rem;
+		margin-right: -0.075rem;
 		border-radius: $radius-tbleft;
 		background: $color2;
 		color: $color1;

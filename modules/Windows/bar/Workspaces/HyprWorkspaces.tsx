@@ -1,4 +1,4 @@
-import { Gdk } from "astal/gtk4";
+import { Gdk, Gtk } from "astal/gtk4";
 import { bind, execAsync, Variable } from "astal";
 import Hyprland from "gi://AstalHyprland";
 import Icon from "../../../lib/icons";
@@ -13,6 +13,7 @@ const moveSilently = (arg: string | number) => {
 // --- signal handler ---
 function ws(id: number) {
 	const hyprland = Hyprland.get_default();
+
 	const getWorkspace = () => hyprland.get_workspace(id) ?? Hyprland.Workspace.dummy(id, null);
 
 	return Variable(getWorkspace()).observe(hyprland, "workspace-added", getWorkspace).observe(hyprland, "workspace-removed", getWorkspace);
@@ -26,15 +27,10 @@ export default function Workspaces() {
 	function workspaceButton(id: number) {
 		return bind(ws(id)).as((ws) => {
 			const Bindings = Variable.derive([bind(hyprland, "focusedWorkspace"), bind(ws, "clients")], (focused, clients) => ({
-
-				classname: [
-					"workspacebutton",
-					focused === ws ? "focused" : "",
-					clients.length > 0 ? "occupied" : ""
-				].join(","),
+				classname: ["workspacebutton", focused === ws ? "focused" : "", clients.length > 0 ? "occupied" : ""],
 				visible: id <= 4 || clients.length > 0 || focused === ws,
 				content: Icon.wsicon[`ws${id}` as keyof typeof Icon.wsicon] ? (
-					<image iconName={Icon.wsicon[`ws${id}` as keyof typeof Icon.wsicon]} halign={CENTER} valign={CENTER} />
+					<image iconName={Icon.wsicon[`ws${id}` as keyof typeof Icon.wsicon]} halign={CENTER} valign={CENTER} pixelSize={10} />
 				) : (
 					<label label={String(id)} halign={CENTER} valign={CENTER} />
 				),
@@ -42,21 +38,24 @@ export default function Workspaces() {
 
 			return (
 				<button
-					cssClasses={[Bindings.as((c) => c.classname).get()]}
+					cssClasses={bind(Bindings).as((c) => c.classname)}
 					visible={Bindings.as((v) => v.visible)}
 					valign={CENTER}
 					halign={CENTER}
-					on_clicked={() => {
-						if (Gdk.BUTTON_PRIMARY) {
-							dispatch(id)
+					onButtonPressed={(_, event) => {
+						switch (event.get_button()) {
+							case Gdk.BUTTON_PRIMARY:
+								{
+									dispatch(id);
+								}
+								break;
+							case Gdk.BUTTON_SECONDARY:
+								{
+									moveSilently(id);
+								}
+								break;
+							// case (Gdk.BUTTON_MIDDLE) {}
 						}
-						if (Gdk.BUTTON_SECONDARY) {
-							moveSilently(id)
-						}
-
-						// if (Gdk.BUTTON_MIDDLE) {}
-
-
 					}}
 				>
 					{Bindings.get().content}

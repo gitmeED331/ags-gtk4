@@ -3,10 +3,22 @@ import { bind, Variable, execAsync } from "astal";
 import AstalWp from "gi://AstalWp";
 import Icon from "../lib/icons";
 import { dashboardLeftStack } from "../Windows/dashboard/LeftSide";
+import AudioMixer from "./AudioMixer";
 
 const TRANSITION = 300;
 const REVEALMIC = Variable(true);
 const { audio } = AstalWp.get_default()!;
+
+export const popped = (
+	<popover
+		position={Gtk.PositionType.BOTTOM}
+		onDestroy={(self) => {
+			self.unparent();
+		}}
+	>
+		<AudioMixer />
+	</popover>
+) as Gtk.Popover;
 
 function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker" | "mic" }) {
 	const Bindings = Variable.derive(
@@ -40,18 +52,45 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 			<box spacing={10}>
 				<image
 					iconName={bind(Bindings).as((c) => c.theIcon)}
-				// css={`
-				// 	font-size: 2rem;
-				// `}
+					// css={`
+					// 	font-size: 2rem;
+					// `}
 				/>
 				<label label={bind(Bindings).as((l) => l.tooltip)} />
 			</box>
 		);
 	}
 
+	const scrollController = new Gtk.EventControllerScroll();
+	scrollController.set_flags(Gtk.EventControllerScrollFlags.BOTH_AXES);
+
+	scrollController.connect("scroll", (_, dx, dy) => {
+		const step = 0.05;
+		const currentVolume = device.get_volume();
+
+		if (dy !== 0) {
+			// First ensure we have a non-zero value
+			if (dy < 0) {
+				device.set_volume(Math.min(currentVolume + step, 1.5));
+			} else {
+				device.set_volume(Math.max(currentVolume - step, 0.0));
+			}
+
+			if (device.get_mute() === true) {
+				device.set_mute(false);
+			}
+		}
+	});
+
 	return (
 		<button
-			cssClasses={["audio-mixer", "volume-indicator", bind(Bindings).as((c) => c.buttonCN).get()]}
+			cssClasses={[
+				"audio-mixer",
+				"volume-indicator",
+				bind(Bindings)
+					.as((c) => c.buttonCN)
+					.get(),
+			]}
 			hasTooltip
 			// tooltip_text={bind(Bindings).as((c) => c.tooltip)}
 			onQueryTooltip={(self, x, y, kbtt, tooltip) => {
@@ -59,29 +98,30 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 				return true;
 			}}
 			onButtonPressed={(_, event) => {
-				if (event.get_button() === Gdk.BUTTON_PRIMARY) {
-					const dashTab = "settings";
-					const win = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
-					const dashboardTab = dashboardLeftStack.get_visible_child_name() === dashTab;
-					const setDashboardTab = dashboardLeftStack.set_visible_child_name(dashTab);
-					if (win && win.visible) {
-						if (!dashboardTab) {
-							setDashboardTab;
-						} else {
-							App.toggle_window(`dashboard${App.get_monitors()[0].get_model()}`);
-						}
-					} else {
-						App.toggle_window(`dashboard${App.get_monitors()[0].get_model()}`);
+				const monitor = App.get_monitors()[0];
+				if (!monitor) return;
+
+				const buttonType = event.get_button();
+
+				switch (buttonType) {
+					case Gdk.BUTTON_PRIMARY: {
+						popped.visible ? popped.popdown() : popped.popup();
+
+						break;
+					}
+					case Gdk.BUTTON_SECONDARY: {
+						device?.set_mute(!device.get_mute());
 					}
 				}
-				if (event.get_button() === Gdk.BUTTON_SECONDARY) {
-					device?.set_mute(!device.get_mute());
-				}
 			}}
-			onScroll={(_, delta_y) => {
-				const volumeChange = delta_y < 0 ? 0.05 : -0.05;
-				device?.set_volume(device.volume + volumeChange);
-				device?.set_mute(false);
+			// onScroll={(_, dx: number, dy: number) => {
+			// 	const volumeChange = dy < 0 ? 0.05 : -0.05;
+			// 	device.set_volume(device.volume + volumeChange);
+			// 	device.set_mute(false);
+			// }}
+			setup={(self) => {
+				self.add_controller(scrollController);
+				popped.set_parent(self);
 			}}
 		>
 			<image iconName={bind(Bindings).as((c) => c.theIcon)} />

@@ -43,7 +43,7 @@ const Icon = {
 		audio: "audio-x-generic-symbolic",
 	},
 	ui: {
-		desktop: "desktop-symbolic",
+		desktop: "preferences-desktop-keyboard-shortcuts-symbolic",
 		close: "window-close-symbolic",
 		colorpicker: "color-select-symbolic",
 		info: "info-symbolic",
@@ -116,7 +116,7 @@ const Icon = {
 		},
 		wifi: {
 			enabled: "network-wireless-symbolic",
-			disabled: "network-wireless-disconnected-symbolic",
+			disabled: "network-wireless-disabled-symbolic",
 			connected: "network-wireless-symbolic",
 			disconnected: "network-wireless-signal-none-symbolic",
 			signal: {
@@ -162,6 +162,10 @@ const Icon = {
 	trash: {
 		full: "user-trash-full-symbolic",
 		empty: "user-trash-symbolic",
+	},
+	DND: {
+		enabled: "preferences-system-notifications-symbolic",
+		disabled: "notifications-disabled-symbolic",
 	},
 	mpris: {
 		shuffle: {
@@ -211,8 +215,6 @@ const Icon = {
 
 export default Icon;
 
-App.add_icons(`${GLib.get_user_data_dir()}/icons/Astal`);
-
 // /**
 //  * @returns substitute icon || name || fallback icon
 //  */
@@ -226,8 +228,8 @@ App.add_icons(`${GLib.get_user_data_dir()}/icons/Astal`);
 
 // 	const icon = (substitutes as SubstitutesType)[name] || name;
 
-// 	if (Widget.Icon.lookup_icon(icon)) return icon;
-// 	console.log(Widget.Icon.lookup_icon(icon));
+// 	if (Astal.Icon.lookup_icon(icon)) return icon;
+// 	console.log(Astal.Icon.lookup_icon(icon));
 
 // 	print(`no icon substitute "${icon}" for "${name}", fallback: "${fallback}"`);
 // 	return fallback;

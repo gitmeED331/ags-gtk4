@@ -1,43 +1,22 @@
 import { Astal, Gtk, Gdk, App, Widget } from "astal/gtk4";
-import { bind, Binding, execAsync, Variable } from "astal";
+import { bind, Binding, exec, execAsync, Variable } from "astal";
 import Mpris from "gi://AstalMpris";
 import { Grid, StackSwitcher, Stack } from "../Astalified/index";
 import Icon from "../lib/icons";
 import TrimTrackTitle from "../lib/TrimTrackTitle";
+import Pango from "gi://Pango";
+import AstalApps from "gi://AstalApps";
+import { popped } from "../Windows/bar/MediaTicker";
 
-/**
- * @param {string} cover_art - Cover image path.
- */
-const blurCoverArtCss = async (cover_art: string): Promise<string> => {
-	/**
-	 * Generate CSS background style for music player.
-	 * @param {string} bg - Background image path.
-	 * @param {string} color - Dominant color extracted from the image.
-	 * @returns {string} CSS background style.
-	 */
-	const playerBGgen = (bg: string, color: string): string =>
-		`background-image: radial-gradient(circle at left, rgba(0, 0, 0, 0), ${color} 12rem), url('${bg}');
-         background-position: left top, left top;
-         background-size: contain;
-         transition: all 0.7s ease;
-         background-repeat: no-repeat;`;
-
-	if (cover_art) {
-		const color = await execAsync(`bash -c "convert ${cover_art} -alpha off -crop 5%x100%0+0+0 -colors 1 -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
-		return playerBGgen(cover_art, color);
-	}
-	return "background-color: #0e0e1e";
-};
+interface AstalApplication {
+	get_icon_name: () => string;
+	get_name: () => string;
+	get_description: () => string;
+	launch: () => void;
+}
 
 /** @param {import('types/service/mpris').MprisPlayer} player */
 function Player(player: Mpris.Player) {
-	async function setup(box: Gtk.Box) {
-		box.css = await blurCoverArtCss(player.cover_art);
-		box.hook(player, "notify::cover-art", async () => {
-			box.css = await blurCoverArtCss(player.cover_art);
-		});
-	}
-
 	const TrackInfo = ({ info }: { info: "tracks" | "artists" }) => {
 		const Bindings = Variable.derive([bind(player, "title"), bind(player, "artist")], (title, artist) => ({
 			classname: {
@@ -58,7 +37,15 @@ function Player(player: Mpris.Player) {
 
 		// return <box cssClasses={"trackinfo"} valign={CENTER} halign={CENTER} hexpand={true} vertical={true} spacing={5}>
 		return (
-			<label cssClasses={[Bindings.as((b) => b.classname).get()]} wrap={false} hexpand={true} halign={CENTER} truncate maxWidthChars={Bindings.as((b) => b.maxwidthchars)} label={Bindings.as((b) => b.label)} />
+			<label
+				cssClasses={[Bindings.as((b) => b.classname).get()]}
+				wrap={false}
+				hexpand={true}
+				halign={CENTER}
+				ellipsize={Pango.EllipsizeMode.END}
+				maxWidthChars={Bindings.as((b) => b.maxwidthchars)}
+				label={Bindings.as((b) => b.label)}
+			/>
 		);
 		// </box>
 	};
@@ -76,7 +63,7 @@ function Player(player: Mpris.Player) {
 			<slider
 				cssClasses={["position", "Slider"]}
 				drawValue={false}
-				onDragged={({ value }) => {
+				onChangeValue={({ value }) => {
 					if (player.length > 0) {
 						const newPosition = (value / player.length) * player.length;
 						player.set_position(newPosition);
@@ -113,7 +100,7 @@ function Player(player: Mpris.Player) {
 					halign={CENTER}
 					valign={CENTER}
 					onDestroy={(self) => {
-						self.destroy();
+						self.unparent();
 					}}
 					{...props}
 				/>
@@ -132,12 +119,31 @@ function Player(player: Mpris.Player) {
 		const Bindings = Variable.derive(
 			[bind(player, "playbackStatus"), bind(player, "entry"), bind(player, "identity"), bind(player, "can_go_previous"), bind(player, "can_play"), bind(player, "can_go_next")],
 			(playbackStatus, entry, identity, can_go_previous, can_play, can_go_next) => ({
+				command: {
+					activePlay: () => {
+						// const dwin = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
+						console.log("button: ", player.entry);
+						execAsync(player.entry);
+						// if (dwin && dwin.visible === true) {
+						// 	dwin.visible = false;
+						// } else if (popped && popped.visible) {
+						// 	popped.popdown();
+						// }
+					},
+					play_pause: () => player.play_pause(),
+					next: () => player.next(),
+					previous: () => player.previous(),
+					close: () => {
+						execAsync(`bash -c 'pkill "${player.entry}"'`);
+					},
+				}[btn],
+
 				classname: {
-					activePlay: "playicon",
-					play_pause: "play-pause",
-					next: "next",
-					previous: "previous",
-					close: "close",
+					activePlay: ["playicon"],
+					play_pause: ["play-pause"],
+					next: ["next"],
+					previous: ["previous"],
+					close: ["close"],
 				}[btn],
 
 				tooltip_text: {
@@ -149,30 +155,11 @@ function Player(player: Mpris.Player) {
 				}[btn],
 
 				visible: {
-					play_pause: can_play,
 					activePlay: true,
+					play_pause: can_play,
 					next: can_go_next,
 					previous: can_go_previous,
 					close: true,
-				}[btn],
-
-				command: {
-					play_pause: () => player.play_pause(),
-					activePlay: () => {
-						const dwin = App.get_window(`dashboard${App.get_monitors()[0]}`);
-						const mpwin = App.get_window(`mediaplayerwindow${App.get_monitors()[0]}`);
-						execAsync(player.entry);
-						if (dwin && dwin.visible === true) {
-							App.toggle_window(`dashboard${App.get_monitors()[0]}`);
-						} else if (mpwin && mpwin.visible === true) {
-							App.toggle_window(`mediaplayerwindow${App.get_monitors()[0]}`);
-						}
-					},
-					next: () => player.next(),
-					previous: () => player.previous(),
-					close: () => {
-						execAsync(`bash -c 'killall "${player.entry}"'`);
-					},
 				}[btn],
 
 				icon: {
@@ -187,12 +174,12 @@ function Player(player: Mpris.Player) {
 
 		return (
 			<button
-				cssClasses={[bind(Bindings).as((b) => b.classname).get()]}
+				cssClasses={bind(Bindings).as((b) => b.classname)}
 				tooltip_text={bind(Bindings).as((b) => b.tooltip_text)}
 				visible={bind(Bindings).as((b) => b.visible)}
-				on_clicked={() => Bindings.get().command()}
+				onButtonReleased={() => Bindings.get().command()}
 				onDestroy={(self) => {
-					self.destroy();
+					self.unparent();
 				}}
 				{...props}
 			>
@@ -215,8 +202,13 @@ function Player(player: Mpris.Player) {
 				self.attach(<Controls btn="activePlay" />, 1, 1, 1, 1);
 				self.attach(TrackPosition(), 0, 2, 2, 1);
 				self.attach(
-					<centerbox cssClasses={["playercontrols"]} vexpand={false} hexpand={false} halign={CENTER} valign={CENTER}
-					// spacing={20}
+					<centerbox
+						cssClasses={["playercontrols"]}
+						vexpand={false}
+						hexpand={false}
+						halign={CENTER}
+						valign={CENTER}
+						// spacing={20}
 					>
 						<Controls btn="previous" />
 						<Controls btn="play_pause" />
@@ -232,7 +224,40 @@ function Player(player: Mpris.Player) {
 	);
 
 	return (
-		<box cssClasses={["player"]} name={player.entry} vertical={false} hexpand={true} spacing={5} halign={CENTER} valign={START} setup={setup}>
+		<box
+			cssClasses={["player"]}
+			name={player.entry}
+			vertical={false}
+			hexpand={true}
+			spacing={5}
+			halign={CENTER}
+			valign={START}
+			onDestroy={(self) => {
+				self.unparent();
+			}}
+			setup={() => {
+				const CoverArtCss = async (cover_art: string): Promise<string> => {
+					const BGgen = (bg: string, color: string): string =>
+						`background-image: radial-gradient(circle at left, rgba(0, 0, 0, 0), ${color} 12rem), url('file://${bg}');` +
+						`background-position: left top, left top;` +
+						`background-size: contain;` +
+						`transition: all 0.7s ease;` +
+						`background-repeat: no-repeat;`;
+
+					if (cover_art) {
+						const color = await execAsync(`bash -c "convert ${cover_art} -alpha off -crop 5%x100%0+0+0 -colors 1 -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
+						return BGgen(cover_art, color);
+					}
+					return "background-color: #0e0e1e;";
+				};
+
+				const coverArtPath = player.cover_art || "";
+
+				CoverArtCss(coverArtPath).then((css) => {
+					App.apply_css(`.player { ${css} }`, false);
+				});
+			}}
+		>
 			{mediaInfoGrid}
 			<Controls btn="close" valign={CENTER} />
 		</box>
@@ -252,6 +277,7 @@ export default function playerStack() {
 			transition_duration={2000}
 			hhomogeneous
 			vhomogeneous
+			onDestroy={(self) => self.unparent()}
 			setup={(self) => {
 				const players = mpris.get_players();
 				players?.forEach((p) => {
@@ -271,8 +297,12 @@ export default function playerStack() {
 				});
 
 				mpris.connect("player-closed", (_, p) => {
-					if (p?.busName) {
-						self.get_child_by_name(p.busName)?.destroy();
+					const name = self.get_child_by_name(p.busName);
+					if (name) {
+						const page = self.get_page(name);
+						if (page) {
+							self.remove(page.get_child());
+						}
 					}
 				});
 			}}
@@ -282,10 +312,12 @@ export default function playerStack() {
 	dashboardPlayerStack = theStack;
 	windowPlayerStack = theStack;
 
-	const switcher = <StackSwitcher stack={theStack} cssClasses={["playerswitcher"]} visible={bind(mpris, "players").as((a) => a.length > 1)} halign={CENTER} spacing={10} valign={CENTER} />;
+	const switcher = (
+		<StackSwitcher stack={theStack} cssClasses={["playerswitcher"]} visible={bind(mpris, "players").as((a) => a.length > 1)} halign={CENTER} valign={CENTER} onDestroy={(self) => self.unparent()} />
+	);
 
 	return (
-		<box halign={CENTER} valign={CENTER} vertical={true} visible={bind(mpris, "players").as((a) => a.length > 0)}>
+		<box halign={CENTER} valign={CENTER} vertical={true} visible={bind(mpris, "players").as((a) => a.length > 0)} onDestroy={(self) => self.unparent()}>
 			{[switcher, theStack]}
 		</box>
 	);

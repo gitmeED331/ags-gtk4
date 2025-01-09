@@ -1,7 +1,7 @@
 import { Astal, Gtk, Gdk, App } from "astal/gtk4";
-import { GLib, bind, monitorFile } from "astal";
+import { GLib, bind, monitorFile, Variable } from "astal";
 import Icon from "../../lib/icons";
-import { Stack, Grid, Scrollable } from "../../Astalified/index";
+import { Stack, Grid, ScrolledWindow } from "../../Astalified/index";
 import entry, { query } from "./search";
 import ScreenSizing from "../../lib/screensizeadjust";
 import { Apps, Applications, AstalApplication } from "./AppAccess";
@@ -29,21 +29,28 @@ export function CreateAppGrid({ appList }: { appList: AstalApplication[] }) {
 	);
 
 	function createAppButton(app: AstalApplication) {
-		const iconName = app.get_icon_name();
-		// const validIcon = validateIcon(iconName);
-
 		return (
 			<button
 				cssClasses={["launcher", "app"]}
 				name={app.get_name()}
 				tooltip_text={app.get_description()}
-				on_clicked={() => {
-					app.launch();
-					App.toggle_window(WINDOWNAME);
+				onButtonPressed={(_, event) => {
+					const win = App.get_window(WINDOWNAME);
+					if (win && event.get_button() === Gdk.BUTTON_PRIMARY) {
+						app.launch();
+						win.visible = !win.visible;
+					}
+				}}
+				onKeyPressed={(_, keyval) => {
+					const win = App.get_window(WINDOWNAME);
+					if ((win && keyval === Gdk.KEY_Return) || (win && keyval === Gdk.KEY_KP_Enter)) {
+						app.launch();
+						win.visible = !win.visible;
+					}
 				}}
 			>
-				<box halign={FILL} valign={FILL} spacing={5} widthRequest={ScreenSizing({ type: "width", multiplier: 0.1 })}>
-					<image iconName={iconName} halign={CENTER} valign={CENTER} />
+				<box halign={FILL} valign={FILL} spacing={5} widthRequest={ScreenSizing({ type: "width", multiplier: 0.2 })}>
+					<image iconName={app.get_icon_name()} pixelSize={30} halign={CENTER} valign={CENTER} />
 					<box vertical>
 						<label label={app.get_name()} cssClasses={["appname"]} halign={START} valign={CENTER} maxWidthChars={30} lines={1} wrap={true} xalign={0} yalign={0} />
 						<label
@@ -64,38 +71,16 @@ export function CreateAppGrid({ appList }: { appList: AstalApplication[] }) {
 		);
 	}
 
-	// function validateIcon(iconName: string | null): boolean {
-	// 	if (!iconName) return false;
-
-	// 	const iconTheme = Gtk.IconTheme;
-
-	// 	if (iconTheme.has_icon(iconName)) return true;
-
-	// 	const iconPath = GLib.find_program_in_path(iconName);
-	// 	if (iconPath && GLib.file_test(iconPath, GLib.FileTest.EXISTS)) return true;
-
-	// 	return false;
-	// }
-
 	return grid;
 }
 
-export const createScrollablePage = (appList: AstalApplication[]) => (
-	<Scrollable
-		vscrollbar-policy={Gtk.PolicyType.AUTOMATIC}
-		hscrollbar-policy={Gtk.PolicyType.NEVER}
-		vexpand={true}
-		hexpand={true}
-		halign={FILL}
-		valign={FILL}
-		// heightRequest={ScreenSizing({ type: "height", multiplier: 0.85 })}
-		// css={`
-		// 	padding: 1rem;
-		// `}
-	>
-		<CreateAppGrid appList={appList} />
-	</Scrollable>
-);
+export const createScrollablePage = (appList: AstalApplication[]) => {
+	return (
+		<Gtk.ScrolledWindow vscrollbar-policy={Gtk.PolicyType.AUTOMATIC} hscrollbar-policy={Gtk.PolicyType.NEVER} vexpand={true} hexpand={true} halign={FILL} valign={FILL}>
+			<CreateAppGrid appList={appList} />
+		</Gtk.ScrolledWindow>
+	);
+};
 
 function getCategories(app: any) {
 	const mainCategories = ["AudioVideo", "Audio", "Video", "Development", "Education", "Game", "Graphics", "Network", "Office", "Science", "Settings", "System", "Utility"];
@@ -152,7 +137,7 @@ export const theStack = (
 		visible={true}
 		hexpand={false}
 		vexpand={true}
-		width_request={ScreenSizing({ type: "width", multiplier: 0.2 })}
+		// width_request={ScreenSizing({ type: "width", multiplier: 0.2 })}
 		setup={(self) => {
 			[allAppsPage, ...categoryPages].forEach((page) => {
 				self.add_named(page, page.name);
@@ -168,20 +153,21 @@ export const Switcher = () => {
 		entry.set_text("");
 	};
 
+	const CName = Variable.derive([bind(theStack, "visible-child-name")], (name) => ({
+		all: name === "All Apps" ? "active" : "",
+		cats: (category: string) => (name === category.toLowerCase() ? "active" : ""),
+	}));
+
 	const allAppsButton = (
 		<button
-			cssClasses={[
-				bind(theStack, "visible_child_name")
-					.as((name) => (name === "All Apps" ? "active" : ""))
-					.toString(),
-			]}
-			on_clicked={() => {
-				if (Gdk.BUTTON_PRIMARY) {
+			cssClasses={bind(CName).as((n) => [n.all])}
+			onButtonPressed={(_, event) => {
+				if (event.get_button() === Gdk.BUTTON_PRIMARY) {
 					handleSwitch("All Apps");
 				}
 			}}
-			onKeyPressed={() => {
-				if (Gdk.KEY_Return) {
+			onKeyPressed={(_, keyval) => {
+				if (keyval === Gdk.KEY_Return || keyval === Gdk.KEY_KP_Enter) {
 					handleSwitch("All Apps");
 				}
 			}}
@@ -196,11 +182,7 @@ export const Switcher = () => {
 
 		return (
 			<button
-				cssClasses={[
-					bind(theStack, "visible_child_name")
-						.as((name) => (name === category.toLowerCase() ? "active" : ""))
-						.get(),
-				]}
+				cssClasses={bind(CName).as((n) => [n.cats(category)])}
 				onButtonPressed={(_, event) => {
 					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
 						handleSwitch(category.toLowerCase());

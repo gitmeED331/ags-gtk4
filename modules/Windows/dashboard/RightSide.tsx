@@ -1,12 +1,6 @@
 import { Widget, Gtk } from "astal/gtk4";
 import { StackSwitcher, Stack, StackSidebar } from "../../Astalified/index";
 
-// --- imported widgets ---
-import {
-	BluetoothDevices,
-	EthernetWidget,
-	WifiAPs
-} from "../../Widgets/index";
 import NotificationList from "./notificationList";
 
 export let dashboardRightStack: Gtk.Stack;
@@ -25,18 +19,9 @@ export default function RightSide() {
 			vexpand={true}
 			setup={(self) => {
 				self.add_titled(NotificationList(), "notifications", "Notifications");
-				self.add_titled(
-					<box cssClasses={["network", "dashboard"]} vertical={true} spacing={5}>
-						<EthernetWidget />
-						<WifiAPs />
-					</box>,
-					"network",
-					"Network",
-				);
-				self.add_titled(BluetoothDevices(), "bluetooth", "Bluetooth");
 			}}
-		/> as Gtk.Stack
-	);
+		/>
+	) as Gtk.Stack;
 
 	dashboardRightStack = rightStack;
 

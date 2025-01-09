@@ -1,23 +1,45 @@
-import { Gtk } from "astal/gtk4";
+import { Gtk, Gdk, App } from "astal/gtk4";
+import { GLib } from "astal";
 import { StackSwitcher, Stack, StackSidebar, Calendar } from "../../Astalified/index";
 
-import { BrightnessSlider, PowerProfiles, AudioMixer, SessionControls } from "../../Widgets/index";
+import { BrightnessSlider, PowerProfiles, SessionControls } from "../../Widgets/index";
 
 export let dashboardLeftStack: Gtk.Stack;
 
 export default function LeftSide() {
-	const settings = (
-		<box name={"settings"} vertical={true} spacing={10}>
-			<AudioMixer />
-			<BrightnessSlider />
-		</box>
-	);
-	const power = (
-		<box name={"power"} cssClasses={["dashboard", "power"]} vertical={true} spacing={10}>
-			<PowerProfiles />
-			<SessionControls />
-		</box>
-	);
+	const Caly = () => {
+		const cal = <Calendar showWeekNumbers halign={CENTER} valign={CENTER} />;
+
+		const btn = (
+			<button
+				halign={CENTER}
+				valign={CENTER}
+				onButtonPressed={(_, event) => {
+					const today = new Date();
+					cal.set_property("year", today.getFullYear());
+					cal.set_property("month", today.getMonth());
+					cal.set_property("day", today.getDate());
+				}}
+			>
+				<image cssClasses={["return-today"]} iconName="nix-snowflake-symbolic" halign={CENTER} />
+			</button>
+		);
+
+		App.connect("window-toggled", () => {
+			const win = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
+			const today = new Date();
+			if (win) {
+				cal.set_property("year", today.getFullYear());
+				cal.set_property("month", today.getMonth());
+				cal.set_property("day", today.getDate());
+			}
+		});
+		return (
+			<box halign={FILL} valign={FILL} vertical spacing={5}>
+				{[cal, btn]}
+			</box>
+		);
+	};
 
 	const leftStack = (
 		<stack
@@ -31,9 +53,7 @@ export default function LeftSide() {
 			hexpand={true}
 			vexpand={true}
 			setup={(self) => {
-				self.add_titled(<Calendar />, "calendar", "Calendar");
-				self.add_titled(power, "power", "Power");
-				self.add_titled(settings, "settings", "Settings");
+				self.add_titled(<Caly />, "calendar", "Calendar");
 			}}
 		/>
 	) as Gtk.Stack;

@@ -1,19 +1,19 @@
-import BatteryButton from "./battery";
-import BrightnessSlider from "./Brightness";
-// import GridCalendar from "./GridCalendar";
-import playerStack from "./MediaPlayer";
-import NotifWidget from "./Notification";
-import VolumeIndicator from "./VolumeIndicator";
 import AudioMixer from "./AudioMixer";
-import PowerProfiles from "./powerprofiles";
-import NetworkButton from "./Network/BarButton";
-import EthernetWidget from "./Network/Ethernet";
-import WifiAPs from "./Network/WiFi";
+import BatteryButton from "./battery";
 import BluetoothButton from "./Bluetooth/BarButton";
 import BluetoothDevices from "./Bluetooth/BluetoothDevices";
-import Tray from "./Tray";
-import SessionControls from "./SessionControls";
+import BrightnessSlider from "./Brightness";
+import EthernetWidget from "./Network/Ethernet";
+// import GridCalendar from "./GridCalendar";
+import NetworkButton from "./Network/BarButton";
+import NotifWidget from "./Notification";
+import playerStack from "./MediaPlayer";
+import PowerProfiles from "./powerprofiles";
 import PrivacyModule from "./PrivacyIndicator";
+import SessionControls from "./SessionControls";
+import Tray from "./Tray";
+import VolumeIndicator from "./VolumeIndicator";
+import Wifi from "./Network/WiFi";
 
 export {
 	AudioMixer,
@@ -26,7 +26,7 @@ export {
 	PowerProfiles,
 	NetworkButton,
 	EthernetWidget,
-	WifiAPs,
+	Wifi,
 	BluetoothButton,
 	BluetoothDevices,
 	PrivacyModule,

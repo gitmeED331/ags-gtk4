@@ -2,9 +2,14 @@
 
 import "./globals";
 import { App, Gdk } from "astal/gtk4";
+import { GLib } from "astal";
 import csshotreload from "./cssHotLoad";
 
+// GLib.setenv("LD_PRELOAD", "", true);
+
 csshotreload;
+
+// App.add_icons(`${GLib.get_user_data_dir()}/icons/Astal`);
 
 // import {
 // 	Bar,
@@ -48,7 +53,7 @@ App.start({
 				}
 			}
 			if (request == "wallpapers") {
-				const win = App.get_window(`wallpapers${monitor.get_model()}`);
+				const win = App.get_window(`wallpaper${monitor.get_model()}`);
 				if (win && win.visible) {
 					win.visible = false;
 					res("Showing Wallpapers");
@@ -99,6 +104,7 @@ App.start({
 			}
 		}
 	},
+	icons: `${GLib.get_user_data_dir()}/icons/Astal/`,
 	main() {
 		for (const monitor of App.get_monitors()) {
 			windows.forEach((window) => window(monitor));

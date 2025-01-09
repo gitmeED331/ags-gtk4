@@ -1,4 +1,10 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
+
+@keyframes spin {
+	to {
+		--gtk-icon-transform: rotate(1turn);
+	}
+}
 
 .bluetooth {
 	&.devicelist-header {
@@ -16,28 +22,25 @@
 			button {
 				&.power-on {
 					color: $color3;
-
 				}
 
 				&.power-off {
 					color: $color4;
-
 				}
 
 				&:hover {
-
 					label,
-					icon {
+					image {
 						color: $color5;
 					}
 				}
 			}
 		}
 
-		.refreshing {
+		&.spinner {
 			color: $color3;
 
-			icon {
+			image {
 				animation: spin 1s infinite linear;
 			}
 		}
@@ -48,24 +51,22 @@
 		padding: 0.25rem;
 
 		&.controls {
-			all: unset;
-			background: transparent;
 			border-radius: $radius;
 			border-left: $border;
 			padding: 0 0.5rem;
 			box-shadow: -0.75rem 0 0.5rem -0.25rem rgba(15, 155, 255, 0.8);
 
-			icon {
-				font-size: 1.25rem;
-			}
-
 			button {
-				all: unset;
+				/* all: unset; */
+				border-radius: $radius;
+				padding: 0.1rem;
+				image {
+					color: $color1;
+				}
 
 				&:hover {
-
 					label,
-					icon {
+					image {
 						color: $color5;
 					}
 				}
@@ -91,16 +92,14 @@
 			border-bottom: $border;
 
 			button {
-
 				label,
-				icon {
+				image {
 					color: $color1;
 				}
 
 				&:hover {
-
 					label,
-					icon {
+					image {
 						color: $color5;
 					}
 				}
@@ -127,6 +126,17 @@
 
 		&-label {
 			color: $color2;
+		}
+		&-tooltip {
+			font-size: 1rem;
+
+			.titles {
+				font-weight: bold;
+			}
+
+			.values {
+				color: $color2;
+			}
 		}
 	}
 }

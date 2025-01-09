@@ -1,4 +1,4 @@
-import { Astal, App, Gdk } from "astal/gtk4";
+import { Astal, App, Gdk, Gtk } from "astal/gtk4";
 import { wired, wifi } from "../Widgets/SystemStats/networkstats";
 import systemStats from "../Widgets/SystemStats/systemStats";
 import PopupWindow from "../lib/popupwindow";
@@ -17,6 +17,12 @@ export default function (monitor: Gdk.Monitor) {
 			}
 			transition={REVEAL_CROSSFADE}
 		/>
+
+		// <Gtk.Popover>
+		// 	<box>
+		// 		{[systemStats(), wifi, wired]}
+		// 	</box>
+		// </Gtk.Popover>
 	);
 	// <window
 	//     name={`systemstats${monitor}`}

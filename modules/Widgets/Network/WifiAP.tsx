@@ -133,20 +133,14 @@ export default function WifiAP({ ap, wifi }: { ap: any; wifi: AstalNetwork.Wifi 
 
 			content: {
 				connect: [<image iconName={ap.icon_name} valign={CENTER} halign={START} />, <label label={label(ssid, freq, rate)} valign={CENTER} halign={START} />],
-				disconnect: <image iconName={"circle-x-symbolic"} />,
+				disconnect: <image iconName={"network-error-symbolic"} />,
 				forget: <image iconName={"edit-delete-symbolic"} />,
 			}[action],
 		}))();
 
 		return (
 			<button
-				cssClasses={[
-					"wifi",
-					"ap",
-					bind(Bindings)
-						.as((c) => c.classname)
-						.get(),
-				]}
+				cssClasses={["wifi", "ap", bind(Bindings).get().classname]}
 				onButtonPressed={(_, event) => {
 					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
 						Bindings.get().command();
@@ -174,47 +168,23 @@ export default function WifiAP({ ap, wifi }: { ap: any; wifi: AstalNetwork.Wifi 
 				cssClasses={["wifi", "ap", isActiveAP ? "connected" : ""]}
 				halign={FILL}
 				valign={FILL}
-				// startWidget={<CustomButton action={"connect"} />}
-				// endWidget={
-				// 	<Stack
-				// 		cssClasses={["wifi", "connected", "controls"]}
-				// 		visible={isActiveAP || isConnecting}
-				// 		halign={END}
-				// 		visibleChildName={isConnecting ? "connectionSpinner" : "apcontrols"}
-				// 		hhomogeneous={false}
-				// 		vhomogeneous={false}
-				// 	>
-				// 		<box name={"connectionSpinner"} halign={END}>
-				// 			<Spinner name={"connectionSpinner"} setup={(self) => (isConnecting ? self.start() : self.stop())} halign={CENTER} valign={CENTER} />
-				// 			<label label={"Connecting..."} halign={END} valign={CENTER} />
-				// 		</box>
-				// 		<box name={"apcontrols"} spacing={5}>
-				// 			<CustomButton action={"disconnect"} />
-				// 			<CustomButton action={"forget"} />
-				// 		</box>
-				// 	</Stack>
-				// }
-			>
-				<CustomButton action={"connect"} />
-				<></>
-				<Stack
-					cssClasses={["wifi", "connected", "controls"]}
-					visible={isActiveAP || isConnecting}
-					halign={END}
-					visibleChildName={isConnecting ? "connectionSpinner" : "apcontrols"}
-					hhomogeneous={false}
-					vhomogeneous={false}
-				>
-					<box name={"connectionSpinner"} halign={END}>
-						<Spinner name={"connectionSpinner"} setup={(self) => (isConnecting ? self.start() : self.stop())} halign={CENTER} valign={CENTER} />
-						<label label={"Connecting..."} halign={END} valign={CENTER} />
+				startWidget={<CustomButton action={"connect"} />}
+				endWidget={
+					<box visible={isActiveAP || isConnecting} halign={END}>
+						{isConnecting ? (
+							<box halign={END}>
+								<Spinner name={"connectionSpinner"} setup={(self) => (isConnecting ? self.start() : self.stop())} halign={CENTER} valign={CENTER} />
+								<label label={"Connecting..."} halign={END} valign={CENTER} />
+							</box>
+						) : (
+							<box spacing={10} halign={END}>
+								<CustomButton action={"disconnect"} />
+								<CustomButton action={"forget"} />
+							</box>
+						)}
 					</box>
-					<box name={"apcontrols"} spacing={5}>
-						<CustomButton action={"disconnect"} />
-						<CustomButton action={"forget"} />
-					</box>
-				</Stack>
-			</centerbox>
+				}
+			/>
 			{PasswordEntry}
 		</box>
 	);

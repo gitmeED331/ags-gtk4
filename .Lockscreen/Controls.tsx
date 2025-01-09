@@ -27,41 +27,41 @@ function Controls() {
 
 		return (
 			<button
-				onClick={(_, event) => {
-					if (event.button === Gdk.BUTTON_PRIMARY) {
+				onButtonPressed={(_, event) => {
+					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
 						execAsync(command);
 					}
 				}}
-				onKeyPressEvent={(_, event) => {
-					if (event.get_keyval()[1] === Gdk.KEY_Return) {
+				onKeyPressed={(_, keyval) => {
+					if (keyval === Gdk.KEY_Return) {
 						execAsync(command);
 					}
 				}}
 				canFocus={true}
 				hasDefault={false}
 			>
-				<icon icon={Icon.powermenu[action]} halign={Gtk.Align.CENTER} valign={Gtk.Align.CENTER} />
+				<image iconName={Icon.powermenu[action]} halign={CENTER} valign={CENTER} />
 			</button>
 		);
 	};
 
-	const CGrid = <Grid
-		halign={Gtk.Align.FILL}
-		valign={Gtk.Align.FILL}
-		hexpand={true}
-		vexpand={true}
-		visible={true}
-		columnSpacing={10}
-		setup={(grid) => {
-			grid.attach(SysButton("reboot"), 0, 0, 1, 1);
-			grid.attach(SysButton("shutdown"), 1, 0, 1, 1);
-		}}
-	/>
-
-
+	const CGrid = (
+		<Grid
+			halign={FILL}
+			valign={FILL}
+			hexpand={true}
+			vexpand={true}
+			visible={true}
+			columnSpacing={10}
+			setup={(grid) => {
+				grid.attach(SysButton("reboot"), 0, 0, 1, 1);
+				grid.attach(SysButton("shutdown"), 1, 0, 1, 1);
+			}}
+		/>
+	);
 
 	return (
-		<box className={"controls"} vertical={false} vexpand={true} spacing={5} halign={Gtk.Align.START} valign={Gtk.Align.START} visible={true}>
+		<box cssClasses={["controls"]} vertical={false} vexpand={true} spacing={5} halign={START} valign={START}>
 			{CGrid}
 		</box>
 	);

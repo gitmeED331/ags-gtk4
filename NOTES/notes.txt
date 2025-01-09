@@ -30,6 +30,19 @@ function Component({ color = "red" }) {
 }
 // ----------------
 
+export const popped = (
+	<popover position={Gtk.PositionType.BOTTOM}>
+		<AudioMixer />
+	</popover>
+) as Gtk.Popover;
+
+setup={(self) => {
+	popped.set_parent(self);
+}}
+
+popped.visible ? popped.popdown() : popped.popup();
+
+
 ellipsize={Pango.EllipsizeMode.END}
 
 transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT}
@@ -166,16 +179,3 @@ function eventHandler(eh: number, width: number, height: number) {
 	/>;
 	return eventbox;
 }
-
-/* old apptitleticker */
-<box>
-	{bind(hyprland, "focusedClient").as((c) => !c ? (
-		<box>No Client focused</box>
-		) : (
-		<box spacing={5}>
-			<icon valign={Gtk.Align.CENTER} halign={Gtk.Align.CENTER} icon={bind(c, "class").as((i) => Icons(i))} />
-			<label valign={Gtk.Align.CENTER} halign={Gtk.Align.CENTER} hexpand={true} ellipsize={Pango.EllipsizeMode.END} label={bind(c, "title")} />
-		</box>
-		),
-	)}
-</box>

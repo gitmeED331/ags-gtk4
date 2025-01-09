@@ -3,18 +3,27 @@ import { execAsync, bind, Variable } from "astal";
 import Icon from "../../lib/icons";
 import AstalNetwork from "gi://AstalNetwork";
 import WifiAP from "./WifiAP";
-import { Scrollable } from "../../Astalified/index";
+import { Spinner } from "../../Astalified/index";
+import { popped } from "./BarButton";
 
 function Header(wifi: AstalNetwork.Wifi) {
 	const CustomButton = ({ action, ...props }: { action: "power" | "refresh" | "manager" } & Widget.ButtonProps) => {
-		const bindings = Variable.derive([bind(wifi, "enabled"), bind(wifi, "scanning")], (enabled, scanning) => ({
+		const Bindings = Variable.derive([bind(wifi, "enabled"), bind(wifi, "scanning")], (enabled, scanning) => ({
 			command: {
-				power: () => (wifi.enabled = !wifi.enabled), //execAsync(`nmcli radio wifi ${enabled ? "off" : "on"}`),
-				refresh: enabled && !scanning ? () => wifi.scan() : () => { },
-				manager: () => (execAsync("nm-connection-editor"), App.toggle_window(`dashboard${App.get_monitors()[0]}`)),
+				power: () => {
+					// wifi.enabled = !wifi.enabled;
+					execAsync(`nmcli radio wifi ${enabled ? "off" : "on"}`);
+				},
+				refresh: () => {
+					enabled && !scanning ? wifi.scan() : "";
+				},
+				manager: () => {
+					execAsync("nm-connection-editor");
+					popped.popdown();
+				},
 			}[action],
 
-			icon: {
+			content: {
 				power: Icon.network.wifi[enabled ? "enabled" : "disabled"],
 				refresh: scanning ? "process-working-symbolic" : "view-refresh-symbolic",
 				manager: Icon.ui.settings,
@@ -27,26 +36,27 @@ function Header(wifi: AstalNetwork.Wifi) {
 			}[action],
 
 			classname: {
-				power: enabled ? "enabled" : "disabled",
-				refresh: scanning ? "spinner" : "refresh",
-				manager: "manager",
+				power: ["network", enabled ? "enabled" : "disabled"],
+				refresh: ["network", scanning ? "spinner" : "refresh"],
+				manager: ["manager"],
 			}[action],
 		}))();
 
 		return (
 			<button
-				cssClasses={["network", bindings.as((c) => c.classname).get()]}
-				tooltip_markup={bindings.as((b) => b.tooltip)}
+				cssClasses={bind(Bindings).as((c) => c.classname)}
+				tooltip_markup={bind(Bindings).as((b) => b.tooltip)}
 				onButtonPressed={(_, event) => {
 					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
-						bindings.get().command();
+						// bind(Bindings).as((c) => c.command);
+						Bindings.get().command();
 					}
 				}}
 				{...props}
 				halign={CENTER}
 				valign={CENTER}
 			>
-				<image iconName={bindings.as((b) => b.icon)} halign={FILL} valign={FILL} />
+				<image iconName={bind(Bindings).as((b) => b.content)} halign={FILL} valign={FILL} />
 			</button>
 		);
 	};
@@ -58,7 +68,7 @@ function Header(wifi: AstalNetwork.Wifi) {
 			valign={FILL}
 			centerWidget={<label label="Wi-Fi" halign={CENTER} valign={CENTER} />}
 			endWidget={
-				<box halign={CENTER} vertical={false} spacing={15}>
+				<box halign={CENTER} spacing={15}>
 					<CustomButton action={"power"} />
 					<CustomButton action={"refresh"} />
 					<CustomButton action={"manager"} />
@@ -68,7 +78,7 @@ function Header(wifi: AstalNetwork.Wifi) {
 	);
 }
 
-export default function () {
+export default function ({ ...props }: Widget.BoxProps) {
 	const Network = AstalNetwork.get_default();
 	const Wifi = Network.wifi;
 
@@ -104,12 +114,11 @@ export default function () {
 	return (
 		<box cssClasses={["network", "wifi", "container"]} halign={FILL} valign={FILL} hexpand={true} visible={true} vertical={true} spacing={10}>
 			{Header(Wifi)}
-			<Scrollable visible={true} vscrollbar-policy={Gtk.PolicyType.AUTOMATIC}
-				hscrollbar-policy={Gtk.PolicyType.NEVER} vexpand={true}>
-				<box cssClasses={["wifi", "aplist-inner"]} halign={FILL} valign={FILL} visible={true} vertical={true} spacing={5}>
+			<Gtk.ScrolledWindow visible vscrollbar-policy={Gtk.PolicyType.AUTOMATIC} hscrollbar-policy={Gtk.PolicyType.NEVER} vexpand={true}>
+				<box cssClasses={["wifi", "aplist-inner"]} halign={FILL} valign={FILL} visible={true} vertical={true} spacing={5} {...props}>
 					{APList}
 				</box>
-			</Scrollable>
+			</Gtk.ScrolledWindow>
 		</box>
 	);
 }

@@ -13,17 +13,21 @@ export default function MediaPlayerWindow(monitor: Gdk.Monitor) {
 		if (win.name === WINDOWNAME) {
 			switch (win.visible) {
 				case true:
-					console.log("player window true section");
 					Mpris.get_default().get_players().length === 0 ? (win.visible = false) : null;
 				case false:
-					Stack !== "org.mpris.MediaPlayer2.Deezer" && Stack !== "no-media" && windowPlayerStack.get_children().length > 0
-						? windowPlayerStack.set_visible_child_name("org.mpris.MediaPlayer2.Deezer")
-						: null;
+					if (
+						windowPlayerStack.get_child_by_name("org.mpris.MediaPlayer2.Deezer") &&
+						windowPlayerStack.get_visible_child_name() !== "no-media" &&
+						windowPlayerStack.observe_children().get_n_items() > 0
+					) {
+						windowPlayerStack.set_visible_child_name("org.mpris.MediaPlayer2.Deezer");
+					}
 			}
 		}
 	});
 
-	return <PopupWindow name={WINDOWNAME} cssClasses={["window media-player"]} exclusivity={Astal.Exclusivity.NORMAL} xcoord={0.7} ycoord={0.05} child={playerStack()} transition={REVEAL_CROSSFADE} />;
+	return <PopupWindow name={WINDOWNAME} exclusivity={Astal.Exclusivity.NORMAL} xcoord={0.7} ycoord={0.05} child={playerStack()} transition={REVEAL_CROSSFADE} />;
+
 	// return (
 	// 	<window
 	// 		name={WINDOWNAME}

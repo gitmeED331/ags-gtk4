@@ -45,18 +45,15 @@ function CenterBar() {
 			halign={CENTER}
 			valign={START}
 			onButtonPressed={(_, event) => {
-				App.toggle_window(`dashboard${App.get_monitors()[0].get_model()}`);
+				const win = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
+				if (win) {
+					win.visible = !win.visible;
+				}
 			}}
-			baselinePosition={Gtk.BaselinePosition.TOP}
-
 		>
 			<DateTimeLabel format="%H:%M:%S" interval={500} halign={START} />
-			<image iconName="nix-snowflake-symbolic" cssClasses={["clock-icon"]} halign={CENTER}
-				setup={(self) => {
-					App.apply_css(`.${self.cssClasses.join(" .")} {margin: 0rem 1rem;}`);
-				}}
-			/>
-			<DateTimeLabel format="%a%b%d" interval={3600000} halign={END} />
+			<image iconName="nix-snowflake-symbolic" cssClasses={["clock-icon"]} halign={CENTER} />
+			<DateTimeLabel format="%a %b %d" interval={3600000} halign={END} />
 		</centerbox>
 	);
 }
@@ -70,7 +67,7 @@ function RightBar() {
 	);
 }
 
-export default function Bar(monitor: Gdk.Monitor) {
+export default function (monitor: Gdk.Monitor) {
 	return (
 		<window
 			cssClasses={["barwindow"]}
@@ -81,8 +78,10 @@ export default function Bar(monitor: Gdk.Monitor) {
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
 			layer={Astal.Layer.TOP}
 			visible={true}
+			halign={FILL}
+			valign={START}
 		>
-			<centerbox cssClasses={["bar"]} valign={START} halign={FILL} baselinePosition={Gtk.BaselinePosition.CENTER}>
+			<centerbox cssClasses={["bar"]} valign={FILL} halign={FILL} baselinePosition={Gtk.BaselinePosition.CENTER} shrinkCenterLast>
 				<LeftBar />
 				<CenterBar />
 				<RightBar />

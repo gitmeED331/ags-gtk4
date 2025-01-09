@@ -1,4 +1,4 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 .tray {
 	background: $TertiaryBG;
@@ -6,14 +6,13 @@
 	border-radius: $radius;
 	padding: 0.25rem;
 
-	>* {
+	> * {
 		border: 2px solid transparent;
 		background-color: transparent;
 		font-weight: bold;
 	}
 
 	button {
-
 		image,
 		icon {
 			color: $color1;
@@ -29,35 +28,38 @@
 	}
 }
 
-menu>menuitem {
+.menu {
 	background: rgba(0, 0, 0, 1);
 	border-radius: $radius;
-	border-bottom: $border;
-	color: $color1;
-	margin: 0.5px;
-	padding: 5px;
+	border: $border;
+	padding: 0.25rem;
 
-	&:hover {
-		color: $color5;
-		font-weight: bold;
-		border: $border;
-		border-top: none;
-		border-color: $color4;
-
-		icon,
-		image {
-			color: $color4;
-		}
-	}
-
-	icon,
-	image {
+	.flat {
+		background: rgba(0, 0, 0, 1);
+		border-radius: $radius;
 		color: $color1;
-	}
+		margin: 0.5px;
+		padding-left: 5px;
 
-	&:disabled {
-		color: gray;
-		background: rgba(39, 38, 38, 0.5);
-		border: none;
+		&:hover {
+			color: $color5;
+			font-weight: bold;
+			border: $border;
+			border-top: none;
+			border-color: $color4;
+
+			image {
+				color: $color4;
+			}
+		}
+		image {
+			color: $color1;
+		}
+
+		&:disabled {
+			color: gray;
+			background: rgba(39, 38, 38, 0.5);
+			border: none;
+		}
 	}
 }

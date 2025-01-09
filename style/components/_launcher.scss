@@ -1,31 +1,26 @@
-@use '../_variables' as *;
-
+@use "../_variables" as *;
 
 .launcher {
 	&.container {
 		// all: unset;
 		padding-right: 1rem;
 		min-width: 30rem;
-		background: $PrimaryBG;
+		/* background: $PrimaryBG; */
 		border-radius: $radius-tbleft;
 		border: $border;
 		border-left: none;
+
 		// box-shadow: 0rem 0rem 2rem 2rem rgba(15, 155, 255, 0.8);
 	}
 
 	&.contentgrid,
 	.grid {
-		// background-image: url("../../assets/groot-thin-right.png");
-		background-color: black;
-		background-size: contain;
-		background-repeat: no-repeat;
-		background-position: center;
-		background-color: rgba(0, 0, 0, 1);
 		border-radius: $radius-tbright;
 		border: $border;
 		border-left: none;
-		min-width: 15rem;
-		min-height: 30rem;
+		/* min-width: 15rem; */
+		/* min-height: 25rem; */
+		padding-bottom: 0.5rem;
 		// border-bottom: none;
 		// box-shadow: 0rem 0rem 2rem 2rem rgba(15, 155, 255, 0.8);
 	}
@@ -74,7 +69,6 @@
 			border-bottom: none;
 		}
 
-		icon,
 		image {
 			font-size: 2.25rem;
 			color: $color1;
@@ -106,7 +100,8 @@
 				text-shadow: 0.3rem 0.3rem 0.5rem $color2;
 			}
 
-			icon {
+			icon,
+			image {
 				-gtk-icon-shadow: 0.3rem 0.3rem 0.5rem $color2;
 				animation: spin 1s linear infinite;
 			}
@@ -115,6 +110,7 @@
 
 	.stack {
 		border-bottom: none;
+		margin: 0.5rem 0rem;
 	}
 
 	.switcher {
@@ -128,26 +124,26 @@
 		button {
 			background: none;
 
+			&:focus-visible,
+			&:focus,
 			&.active {
 				background-color: black;
 				border-radius: $radius;
 				border: $border;
 
-				icon {
+				image {
 					background: $BGG4;
 					border-radius: $radius-tbleft;
 				}
 			}
 
-			&:focus-visible,
-			&:focus,
 			&:hover {
 				background: $BGG3;
 				background-color: black;
 				border-radius: $radius;
 			}
 
-			icon {
+			image {
 				padding: 10px;
 				color: $color1;
 				font-size: 2rem;
@@ -178,38 +174,39 @@
 		}
 	}
 
-	.favorites-bar {
-		background-color: rgba(0, 0, 0, 0);
-		box-shadow: inset 0rem 0.5rem 1.5rem 0 rgba(219, 15, 255, 0.8);
-		padding: 0.25rem 1rem;
-		border-radius: $radius;
-	}
-
-	.favorite-app {
-		padding: 0.75rem;
-		border-radius: $radius;
-		border-bottom: $border;
-		border-color: rgba(0, 0, 0, 0);
-
-		icon,
-		image {
-			font-size: 1.5rem;
+	.favorites {
+		&-bar {
+			/* background-color: rgba(0, 0, 0, 0); */
+			box-shadow: inset 0rem 0.5rem 1.5rem 0 rgba(219, 15, 255, 0.8);
+			padding: 0.25rem 1rem;
+			border-radius: $radius;
 		}
 
-		&.active,
-		&:focus,
-		&:hover {
-			background-color: rgba(0, 0, 0, 0.8);
+		&-app {
+			padding: 0.75rem;
 			border-radius: $radius;
 			border-bottom: $border;
+			border-color: rgba(0, 0, 0, 0);
 
-			label {
-				text-shadow: 0.3rem 0.3rem 0.5rem $color2;
+			image {
+				font-size: 1.5rem;
 			}
 
-			icon {
-				-gtk-icon-shadow: 0.3rem 0.3rem 0.5rem $color2;
-				animation: spin 1s linear infinite;
+			&.active,
+			&:focus,
+			&:hover {
+				/* background-color: rgba(0, 0, 0, 0.8); */
+				border-radius: $radius;
+				border-bottom: $border;
+
+				label {
+					text-shadow: 0.3rem 0.3rem 0.5rem $color2;
+				}
+
+				image {
+					-gtk-icon-shadow: 0.3rem 0.3rem 0.5rem $color2;
+					animation: spin 1s linear infinite;
+				}
 			}
 		}
 	}

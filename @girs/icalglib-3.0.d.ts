@@ -1429,12 +1429,14 @@ declare module 'gi://ICalGLib?version=3.0' {
              * that are specified as an EXDATE or an EXRULE.
              * @param start Ignore timespans before this
              * @param end Ignore timespans after this
+             * @param callback Function called for each timespan within the range
              */
-            foreach_recurrence(start: Time, end: Time): void;
+            foreach_recurrence(start: Time, end: Time, callback: ComponentForeachRecurrenceFunc): void;
             /**
              * Applies the same manipulation on every tzid in #ICalComponent.
+             * @param callback The callback function
              */
-            foreach_tzid(): void;
+            foreach_tzid(callback: ComponentForeachTZIDFunc): void;
             /**
              * Gets the comment of the #ICalComponent.
              * @returns The comment of @comp.

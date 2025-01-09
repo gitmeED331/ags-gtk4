@@ -8,18 +8,28 @@ export default function FavoritesBar({ favorites }: any) {
 		<box orientation={Gtk.Orientation.HORIZONTAL} spacing={10} halign={CENTER} valign={CENTER} cssClasses={["favorites-bar"]} visible={true} hexpand={true}>
 			{favorites.map((app: any) => (
 				<button
-					cssClasses={["launcher", "favorite-app"]}
+					cssClasses={["launcher", "favorites-app"]}
 					name={app.get_name()}
 					valign={CENTER}
 					halign={CENTER}
 					tooltip_text={app.get_description()}
 					onButtonPressed={() => {
-						app.launch();
-						App.toggle_window(`launcher${App.get_monitors()[0].get_model()}`);
+						const win = App.get_window(`launcher${App.get_monitors()[0].get_model()}`);
+						if (win) {
+							app.launch();
+							win.visible = !win.visible;
+						}
+					}}
+					onKeyPressed={() => {
+						const win = App.get_window(`launcher${App.get_monitors()[0].get_model()}`);
+						if (win) {
+							app.launch();
+							win.visible = !win.visible;
+						}
 					}}
 				>
-					<image iconName={app.icon_name} />
-					{/* <label label={app.get_name()} truncate /> */}
+					<image iconName={app.icon_name} valign={CENTER} halign={CENTER} />
+					{/* <label label={app.get_name()} truncate valign={CENTER} halign={CENTER}/> */}
 				</button>
 			))}
 		</box>

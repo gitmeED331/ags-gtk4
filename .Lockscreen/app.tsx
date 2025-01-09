@@ -9,20 +9,20 @@ import { Astal, App, Gtk, Gdk, astalify } from "astal/gtk4";
 import { bind, Variable, timeout, GLib } from "astal";
 import Lock from "gi://GtkSessionLock";
 import AstalAuth from "gi://AstalAuth";
-import AstalMpris from "gi://AstalMpris";
+// import AstalMpris from "gi://AstalMpris";
 import { Grid, Fixed, RegularWindow } from "../modules/Astalified/index";
 
 /* Widgets */
 import Controls from "./Controls";
 import { BatteryButton, BluetoothButton, VolumeIndicator, NetworkButton } from "../modules/Widgets/index";
-import Player from "./MediaPlayer";
+// import Player from "./MediaPlayer";
 import Clock from "./clock";
 
 import lockstyle from "./style/Lockscreen.scss";
 import ScreenSizing from "../modules/lib/screensizeadjust";
 
 const background = "windows-failure.jpg";
-const player = AstalMpris.Player.new("Deezer");
+// const player = AstalMpris.Player.new("Deezer");
 const pam = new AstalAuth.Pam();
 const prompt = Variable("");
 const inputVisible = Variable(true);
@@ -35,16 +35,16 @@ function authMessages() {
 	};
 	const box = <box halign={CENTER} valign={CENTER} />;
 	pam.connect("auth-error", (auth, msg) => {
-		(box as Gtk.Box).add(messageLabel(msg, "auth-error"));
-		box.show_all();
+		(box as Gtk.Box).append(messageLabel(msg, "auth-error"));
+		box.show();
 	});
 	pam.connect("auth-info", (auth, msg) => {
-		(box as Gtk.Box).add(messageLabel(msg, "auth-info"));
-		box.show_all();
+		(box as Gtk.Box).append(messageLabel(msg, "auth-info"));
+		box.show();
 	});
 	pam.connect("fail", (auth, msg) => {
-		(box as Gtk.Box).add(messageLabel(msg, "fail"));
-		box.show_all();
+		(box as Gtk.Box).append(messageLabel(msg, "fail"));
+		box.show();
 	});
 	// pam.connect("success", (auth, msg) => {
 	//     (box as Gtk.Box).add(messageLabel(msg, "success"));
@@ -55,7 +55,7 @@ function authMessages() {
 
 const PasswordEntry = (
 	<entry
-		className={"password"}
+		cssClasses={["password"]}
 		placeholder_text={"Enter your password..."}
 		visibility={false}
 		onActivate={(self) => {
@@ -85,16 +85,17 @@ function loginGrid() {
 		</box>
 	);
 
-	const currentUser = <label className={"username"} label={bind(pam, "username").as((u) => u.toUpperCase())} halign={CENTER} valign={CENTER} />;
+	const currentUser = <label cssClasses={["username"]} label={bind(pam, "username").as((u) => u.toUpperCase())} halign={CENTER} valign={CENTER} />;
 
-	const currentDesktop = <label className={"desktop"} label={GLib.getenv("XDG_CURRENT_DESKTOP") ? GLib.getenv("XDG_CURRENT_DESKTOP")?.toUpperCase() : ""} halign={CENTER} valign={CENTER} />;
+	const currentDesktop = <label cssClasses={["desktop"]} label={GLib.getenv("XDG_CURRENT_DESKTOP") ? GLib.getenv("XDG_CURRENT_DESKTOP")?.toUpperCase() : ""} halign={CENTER} valign={CENTER} />;
 
 	const grid = (
 		<Grid
-			className={"logingrid"}
+			cssClasses={["logingrid"]}
 			halign={CENTER}
 			valign={CENTER}
-			expand
+			hexpand
+			vexpand
 			rowSpacing={15}
 			visible={true}
 			setup={(self) => {
@@ -111,10 +112,11 @@ function loginGrid() {
 
 const topRightGrid = (
 	<Grid
-		className={"topright"}
+		cssClasses={["topright"]}
 		halign={END}
 		valign={START}
-		expand
+		hexpand
+		vexpand
 		visible={true}
 		columnSpacing={10}
 		setup={(self) => {
@@ -128,19 +130,20 @@ const topRightGrid = (
 
 function Lockscreen({ monitor }: { monitor: Gdk.Monitor }) {
 	const overlayBox = (
-		<box halign={FILL} valign={FILL} expand vertical>
-			<centerbox halign={FILL} valign={START} expand>
+		<box halign={FILL} valign={FILL} hexpand vexpand vertical>
+			<centerbox halign={FILL} valign={START} hexpand vexpand>
 				{Controls()}
 				{Clock()}
 				{topRightGrid}
 			</centerbox>
-			<Player player={player} />
+			{/* <Player player={player} /> */}
 		</box>
 	);
 
 	const tsxFixed = (
 		<Fixed
-			expand
+			vexpand
+			hexpand
 			visible={true}
 			widthRequest={250}
 			heightRequest={500}
@@ -153,24 +156,26 @@ function Lockscreen({ monitor }: { monitor: Gdk.Monitor }) {
 
 	return (
 		<RegularWindow
-			name={`lockscreen-${monitor}`}
-			className={"lockscreen"}
+			name={`lockscreen${monitor.get_model()}`}
+			cssClasses={["lockscreen"]}
 			visible={false}
 			halign={FILL}
 			valign={FILL}
 			application={App}
-			expand
+			hexpand
+			vexpand
 			resizable={false}
 			decorated={false}
-			css={`
+			setup={() => {
+				App.apply_css(`
 				background-image: url("../assets/${background}");
 				background-repeat: no-repeat;
 				background-position: center;
 				background-size: cover;
-			`}
-			onKeyPressEvent={(_, event) => {
-				const keyval = event.get_keyval()[1];
-				const state = event.get_state()[1];
+			`);
+			}}
+			onKeyPressed={(_, keyval, state) => {
+				// const state = event.get_state()[1];
 				const modPressed = state & Gdk.ModifierType.CONTROL_MASK;
 				if (keyval === Gdk.KEY_Escape && modPressed) {
 					UIVisibility.set(!UIVisibility.get());
@@ -180,12 +185,12 @@ function Lockscreen({ monitor }: { monitor: Gdk.Monitor }) {
 				}
 			}}
 		>
-			<overlay visible={bind(UIVisibility)} passThrough={true} clickThrough={true} halign={FILL} valign={FILL} expand>
+			<overlay visible={bind(UIVisibility)} halign={FILL} valign={FILL} hexpand vexpand>
 				{overlayBox}
 				{tsxFixed}
 			</overlay>
 		</RegularWindow>
-	)
+	);
 }
 
 const windows: { window: Gtk.Window; monitor: Gdk.Monitor }[] = [];
@@ -199,26 +204,30 @@ function createWindow(monitor: Gdk.Monitor): { window: Gtk.Window; monitor: Gdk.
 
 function startLock() {
 	const display = Gdk.Display.get_default();
-	// @ts-expect-error
-	for (let m = 0; m < display?.get_n_monitors(); m++) {
-		const monitor = display?.get_monitor(m);
+	if (!display) return;
+
+	for (let m = 0; m < display.get_n_monitors(); m++) {
+		const monitor = display.get_monitor(m);
 		if (monitor) {
 			createWindow(monitor);
 		}
 	}
-	display?.connect("monitor-added", (ds, monitor) => {
+
+	display.connect("monitor-added", (_display, monitor) => {
 		if (monitor) {
 			const w = createWindow(monitor);
 			sessionLock.new_surface(w.window, w.monitor);
 			w.window.show();
 		}
 	});
+
 	sessionLock.lock_lock();
 	windows.map((w) => {
 		sessionLock.new_surface(w.window, w.monitor);
 		w.window.show();
 	});
 }
+
 pam.connect("auth-prompt-visible", (auth, msg) => {
 	prompt.set(msg);
 	inputVisible.set(true);

@@ -5,16 +5,17 @@
 		-gtk-icon-transform: rotate(1turn);
 	}
 }
-
+.barwindow {
+	all: unset;
+}
 .bar {
 	color: $color7;
 	background: none;
-	margin-right: 7px;
 
 	.left,
 	.center,
 	.right {
-		min-width: 100px;
+		min-width: 10rem;
 	}
 }
 
@@ -26,7 +27,7 @@
 	/* min-width: 50px; */
 	padding: 0 0.5rem;
 
-	icon {
+	image {
 		color: $color5;
 		font-size: 1rem;
 	}
@@ -37,7 +38,8 @@
 	}
 
 	&:hover {
-		icon {
+		icon,
+		image {
 			color: $color1;
 			animation: spin 1s ease-in-out infinite;
 			// -gtk-icon-transform: scale(2);
@@ -63,7 +65,6 @@
 		/* color: inherit; // keeps label consistent with parent */
 	}
 
-	icon,
 	image {
 		color: $color5;
 	}
@@ -71,11 +72,13 @@
 	&:hover {
 		color: $color5;
 
-		icon,
 		image {
 			color: $color1;
 			animation: spin 1s linear infinite;
 		}
+	}
+	&-icon {
+		margin: 0rem 1rem;
 	}
 }
 
@@ -91,7 +94,6 @@
 	.volumebtn {
 		color: inherit;
 
-		icon,
 		image {
 			font-size: 1.15rem;
 		}

@@ -1,4 +1,4 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 .cliphist {
 	&.contentgrid {
@@ -27,21 +27,22 @@
 			color: $color1;
 			border-radius: $radius;
 
-			icon {
+			image {
 				margin: -0.25rem;
 			}
 
 			&:hover {
 				color: $color2;
 				background: $color4;
+				animation: spin 1s linear infinite;
 			}
 		}
 
-		.clear_hist icon {
+		.clear_hist image {
 			font-size: 2rem;
 		}
 
-		.refresh_hist icon {
+		.refresh_hist image {
 			font-size: 1.5rem;
 		}
 
@@ -56,7 +57,7 @@
 		}
 	}
 
-	button.item {
+	.item {
 		all: unset;
 		padding: 0 0.75rem;
 		min-height: 1.5rem;
@@ -67,7 +68,7 @@
 			border-bottom: none;
 		}
 
-		icon {
+		image {
 			font-size: 2rem;
 			color: $color1;
 			border-radius: 10rem;
@@ -90,9 +91,8 @@
 				text-shadow: 0.3rem 0.3rem 0.5rem $color2;
 			}
 
-			icon {
+			image {
 				-gtk-icon-shadow: 0.3rem 0.3rem 0.5rem $color2;
-				animation: spin 1s linear infinite;
 			}
 		}
 
@@ -103,6 +103,7 @@
 		}
 
 		.imagePreview {
+			all: unset;
 			background-size: contain;
 			background-position: center;
 			background-repeat: no-repeat;

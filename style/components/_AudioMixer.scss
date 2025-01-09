@@ -1,8 +1,23 @@
-@use '../_variables' as *;
-
+@use "../_variables" as *;
 
 .audio-mixer {
 	color: $color1;
+
+	&.container {
+		background: $SecondaryBG;
+		border-radius: calc($radius * 1.25);
+		border: $border;
+		padding: 1rem;
+
+		.devices,
+		.streams {
+			margin-top: 0.5rem;
+
+			.header {
+				margin-bottom: 1rem;
+			}
+		}
+	}
 
 	.header {
 		border-radius: $radius;
@@ -17,22 +32,6 @@
 
 		&:hover {
 			color: $color5;
-		}
-	}
-
-	&.container {
-		background: $PrimaryBG;
-		border-radius: calc($radius * 1.25);
-		border: $border;
-		padding: 1rem;
-
-		.devices,
-		.streams {
-			margin-top: 0.5rem;
-
-			.header {
-				margin-bottom: 1rem;
-			}
 		}
 	}
 
@@ -134,7 +133,8 @@
 }
 
 .volume-indicator {
-	icon {
+	icon,
+	image {
 		font-size: 1rem;
 	}
 

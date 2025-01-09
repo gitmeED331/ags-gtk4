@@ -3,8 +3,8 @@
 import { bind, Variable } from "astal";
 import { App, Astal, Gdk, Gtk, Widget } from "astal/gtk4";
 import { WindowProps, Revealer } from "astal/gtk4/widget";
-import { Fixed } from "modules/Astalified/index";
-import ScreenSizing from "modules/lib/screensizeadjust";
+import { Fixed } from "../Astalified/index";
+import ScreenSizing from "../lib/screensizeadjust";
 
 type GlobalEventBoxes = {
 	[key: string]: unknown;
@@ -26,43 +26,40 @@ export default ({ name, child, xcoord, ycoord, transition, exclusivity = Astal.E
 		<window
 			name={name}
 			cssClasses={[name, "popup"]}
-			onKeyPressed={(_, keyval) => {
-				const win = App.get_window(name);
-				if (win && win?.visible && keyval === Gdk.KEY_Escape) {
-					win.visible = false;
-				}
-			}}
+			{...props}
 			visible={false}
 			application={App}
 			keymode={Astal.Keymode.ON_DEMAND}
 			exclusivity={exclusivity}
 			layer={Astal.Layer.TOP}
 			anchor={TOP | BOTTOM | LEFT | RIGHT}
-			{...props}
+			onKeyReleased={(_, keyval) => {
+				const win = App.get_window(name);
+				if (win && win?.visible && keyval === Gdk.KEY_Escape) {
+					win.visible = false;
+				}
+			}}
 		>
-			<button
-				halign={FILL}
-				valign={FILL}
-				onButtonPressed={(_, event) => {
+			<Fixed
+				cssClasses={["popup-container"]}
+				onButtonReleased={(_, event) => {
 					const win = App.get_window(name);
-					if ((win && win?.visible && event.get_button() === Gdk.BUTTON_PRIMARY) || event.get_button() === Gdk.BUTTON_SECONDARY) {
+					if ((win && win.visible && event.get_button() === Gdk.BUTTON_PRIMARY) || Gdk.BUTTON_SECONDARY) {
 						win!.visible = false;
 					}
 				}}
-			>
-				<Fixed
-					cssClasses={["popup-container"]}
-					canFocus
-					setup={(self) => {
-						self.put(
-							<button
-								onButtonPressed={(_, event) => {
-									if (event.get_button() === Gdk.BUTTON_PRIMARY || event.get_button() === Gdk.BUTTON_SECONDARY) {
-										return true;
-									}
-								}}
-							>
-								{/* <revealer
+				halign={FILL}
+				valign={FILL}
+				setup={(self) => {
+					self.put(
+						<box
+							onButtonReleased={(_, event) => {
+								if (event.get_button() === (Gdk.BUTTON_PRIMARY || Gdk.BUTTON_SECONDARY)) {
+									return true;
+								}
+							}}
+						>
+							{/* <revealer
 									revealChild={false}
 									setup={(self: Revealer) => {
 										App.connect("window-toggled", (app) => {
@@ -77,15 +74,14 @@ export default ({ name, child, xcoord, ycoord, transition, exclusivity = Astal.E
 									transitionType={transition}
 									transitionDuration={400}
 								> */}
-								{child}
-								{/* </revealer> */}
-							</button>,
-							ScreenSizing({ type: "width", multiplier: xcoord ?? 0 }),
-							ScreenSizing({ type: "height", multiplier: ycoord ?? 0 }),
-						);
-					}}
-				/>
-			</button>
+							{child}
+							{/* </revealer> */}
+						</box>,
+						ScreenSizing({ type: "width", multiplier: xcoord ?? 0 }),
+						ScreenSizing({ type: "height", multiplier: ycoord ?? 0 }),
+					);
+				}}
+			/>
 		</window>
 	);
 };

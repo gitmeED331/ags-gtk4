@@ -27,6 +27,7 @@ type TrayItem = ReturnType<ReturnType<typeof AstalTray.Tray.get_default>["get_it
 function createMenu(menuModel: Gio.MenuModel, actionGroup: Gio.ActionGroup): Gtk.PopoverMenu {
 	const menu: Gtk.PopoverMenu = Gtk.PopoverMenu.new_from_model(menuModel);
 	menu.insert_action_group("dbusmenu", actionGroup);
+	menu.set_css_classes(["menu"]);
 	return menu;
 }
 
@@ -42,7 +43,7 @@ const SysTrayItem = (item: TrayItem) => {
 			valign={CENTER}
 			tooltip_markup={bind(item, "tooltip_markup")}
 			use_underline={false}
-			onButtonPressed={(btn, event) => {
+			onButtonPressed={(self, event) => {
 				if (event.get_button() === Gdk.BUTTON_PRIMARY) {
 					clickCount++;
 					if (clickCount === 1) {
@@ -56,24 +57,26 @@ const SysTrayItem = (item: TrayItem) => {
 						App.toggle_window(`dashboard${App.get_monitors()[0].get_model()}`);
 					}
 				}
-				// if (event.button === Gdk.BUTTON_SECONDARY) {
-				// 	menu?.popup_at_widget(btn, Gdk.Gravity.EAST, Gdk.Gravity.WEST, null);
-				// }
+				if (event.get_button() === Gdk.BUTTON_SECONDARY) {
+					menu.set_position(Gtk.PositionType.BOTTOM);
+					menu.set_parent(self);
+					menu.show();
+				}
 			}}
 		>
 			<image gicon={bind(item, "gicon")} halign={CENTER} valign={CENTER} />
 		</button>
 	);
 
-	menu.connect("notify::menu-model", () => {
+	item.connect("notify::menu-model", () => {
 		const newMenu = createMenu(item.menu_model, item.action_group);
-		menu.destroy();
+		menu.unparent();
 		menu = newMenu;
 	});
 
-	menu.connect("notify::action-group", () => {
+	item.connect("notify::action-group", () => {
 		const newMenu = createMenu(item.menu_model, item.action_group);
-		menu.destroy();
+		menu.unparent();
 		menu = newMenu;
 	});
 
@@ -97,7 +100,7 @@ const setupTray = (box: Gtk.Box) => {
 	const removeItem = (id: string) => {
 		const trayItem = items.get(id);
 		if (trayItem) {
-			trayItem.destroy();
+			trayItem.unparent();
 			items.delete(id);
 		}
 	};
@@ -110,4 +113,4 @@ const setupTray = (box: Gtk.Box) => {
 	systemTray.connect("item_removed", (_, id) => removeItem(id));
 };
 
-export default () => <box cssClasses={["tray container"]} halign={CENTER} valign={CENTER} vexpand hexpand vertical setup={setupTray} />;
+export default () => <box cssClasses={["tray", "container"]} halign={CENTER} valign={CENTER} vexpand hexpand setup={setupTray} />;

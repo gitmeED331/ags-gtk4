@@ -3,7 +3,7 @@ import { execAsync, monitorFile } from "astal";
 
 /* CSS Hot Reload */
 async function monitorStyle() {
-	const pathsToMonitor = [`${SRC}/style/globals`, `${SRC}/style/components`, `${SRC}/style/variables.scss`]; // Paths to monitor
+	const pathsToMonitor = [`${SRC}/style/globals`, `${SRC}/style/components`, `${SRC}/style/_variables.scss`]; // Paths to monitor
 
 	const mainScss = `${SRC}/style/main.scss`; // SCSS input file to compile
 	const css = `/tmp/style.css`; // CSS output file

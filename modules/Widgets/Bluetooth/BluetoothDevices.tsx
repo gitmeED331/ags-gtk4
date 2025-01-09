@@ -1,40 +1,41 @@
-import { Gtk, Gdk, App, Widget, astalify } from "astal/gtk4";
+import { Gtk, Gdk, App, Widget } from "astal/gtk4";
 import { bind, execAsync, exec, Variable } from "astal";
 import Icon from "../../lib/icons";
 import AstalBluetooth from "gi://AstalBluetooth";
-import { Scrollable } from "../../Astalified/index";
+import { ScrolledWindow } from "../../Astalified/index";
+import { popped } from "./BarButton";
 
 function AdapterControls(bluetooth: AstalBluetooth.Bluetooth, adapter: AstalBluetooth.Adapter) {
 	function Buttons({ action, ...props }: { action: "blueman" | "refresh" | "power" } & Widget.ButtonProps) {
-		const Bindings = Variable.derive([bind(bluetooth, "is_powered"), bind(adapter, "discovering")], (is_powered, discovering) => ({
+		const Bindings = Variable.derive([bind(bluetooth, "is_powered"), bind(adapter, "discovering")], (isPowered, discovering) => ({
+			command: {
+				power: () => {
+					isPowered ? adapter.set_powered(false) : adapter.set_powered(true);
+					// execAsync(`bluetoothctl power ${isPowered ? "off" : "on"}`);
+				},
+				refresh: () => {
+					discovering ? adapter.stop_discovery() : (adapter.start_discovery(), setTimeout(() => adapter.stop_discovery(), 60000));
+				},
+				blueman: () => {
+					execAsync("blueman-manager");
+					popped.popdown();
+				},
+			}[action],
+
 			tooltip: {
-				power: is_powered ? "Disable Bluetooth" : "Enable Bluetooth",
+				power: isPowered ? "Disable Bluetooth" : "Enable Bluetooth",
 				refresh: discovering ? "Scanning..." : "Refresh",
 				blueman: "Blueman",
 			}[action],
 
 			classname: {
-				power: is_powered ? "power-on" : "power-off",
-				refresh: discovering ? "spinner" : "refresh",
-				blueman: "blueman",
-			}[action],
-
-			command: {
-				power: () => {
-					is_powered ? adapter.set_powered(false) : adapter.set_powered(true);
-					// execAsync(`bluetoothctl power ${is_powered ? "off" : "on"}`);
-				},
-				refresh: () => {
-					discovering ? adapter.stop_discovery() : [adapter.start_discovery(), setTimeout(() => adapter.stop_discovery(), 60000)];
-				},
-				blueman: () => {
-					execAsync("blueman-manager");
-					App.toggle_window(`dashboard${App.get_monitors()[0].get_model()}`);
-				},
+				power: ["bluetooth", isPowered ? "power-on" : "power-off"],
+				refresh: ["bluetooth", discovering ? "spinner" : "refresh"],
+				blueman: ["bluetooth", "blueman"],
 			}[action],
 
 			icon: {
-				power: is_powered ? Icon.bluetooth.enabled : Icon.bluetooth.disabled,
+				power: isPowered ? Icon.bluetooth.enabled : Icon.bluetooth.disabled,
 				refresh: discovering ? "process-working-symbolic" : "view-refresh-symbolic",
 				blueman: Icon.ui.settings,
 			}[action],
@@ -42,16 +43,19 @@ function AdapterControls(bluetooth: AstalBluetooth.Bluetooth, adapter: AstalBlue
 
 		return (
 			<button
-				onButtonPressed={() => {
-					Bindings.get().command();
+				onButtonPressed={(_, event) => {
+					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
+						Bindings.get().command();
+						// bind(Bindings).as((c) => c.command());
+					}
 				}}
-				cssClasses={["bluetooth", Bindings.as((c) => c.classname).get()]}
+				cssClasses={bind(Bindings).as((c) => c.classname)}
 				halign={CENTER}
 				valign={CENTER}
-				tooltip_text={Bindings.as((t) => t.tooltip)}
+				tooltip_text={bind(Bindings).as((t) => t.tooltip)}
 				{...props}
 			>
-				<image iconName={Bindings.as((i) => i.icon)} halign={CENTER} valign={CENTER} />
+				<image iconName={bind(Bindings).as((i) => i.icon)} halign={CENTER} valign={CENTER} pixelSize={15} />
 			</button>
 		);
 	}
@@ -72,9 +76,13 @@ function content(device: AstalBluetooth.Device) {
 
 		return (
 			<button halign={FILL} valign={CENTER} on_clicked={() => execAsync(`bluetoothctl ${device.connected ? "disconnect" : "connect"} ${device.address}`)}>
-				<centerbox halign={START} valign={CENTER}
-					// spacing={5} 
-					startWidget={DeviceTypeIcon} centerWidget={btDeviceLabel} />
+				<centerbox
+					halign={START}
+					valign={CENTER}
+					// spacing={5}
+					startWidget={DeviceTypeIcon}
+					centerWidget={btDeviceLabel}
+				/>
 			</button>
 		);
 	};
@@ -110,9 +118,9 @@ function content(device: AstalBluetooth.Device) {
 			}[action],
 
 			classname: {
-				pair: paired ? "unpair" : "pair",
-				trust: trusted ? "untrust" : "trust",
-				connect: connected ? "disconnect" : "connect",
+				pair: ["bluetooth", "items", "controls", paired ? "unpair" : "pair"],
+				trust: ["bluetooth", "items", "controls", trusted ? "untrust" : "trust"],
+				connect: ["bluetooth", "items", "controls", connected ? "disconnect" : "connect"],
 			}[action],
 
 			visible: {
@@ -124,18 +132,23 @@ function content(device: AstalBluetooth.Device) {
 
 		return (
 			<button
-				cssClasses={["bluetooth", "devicelist-inner", "controls", Bindings.as((c) => c.classname).get()]}
-				visible={Bindings.as((v) => v.visible)}
-				onButtonPressed={Bindings.get().command}
+				cssClasses={bind(Bindings).as((c) => c.classname)}
+				visible={bind(Bindings).as((v) => v.visible)}
+				onButtonPressed={(_, event) => {
+					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
+						// bind(Bindings).as((c) => c.command());
+						Bindings.get().command();
+					}
+				}}
 				halign={END}
 				valign={FILL}
-				tooltip_markup={Bindings.as((t) => t.tooltip)}
+				tooltip_markup={bind(Bindings).as((t) => t.tooltip)}
 				{...props}
 				onDestroy={(self) => {
-					self.destroy();
+					self.unparent();
 				}}
 			>
-				<image iconName={Bindings.as((i) => i.icon)} />
+				<image iconName={Bindings.as((i) => i.icon)} pixelSize={20} />
 			</button>
 		);
 	};
@@ -147,7 +160,7 @@ function content(device: AstalBluetooth.Device) {
 				valign={CENTER}
 				startWidget={DeviceButton()}
 				endWidget={
-					<box cssClasses={["bluetoot", "devicelist-inner", "controls"]} halign={END} valign={FILL} spacing={5}>
+					<box cssClasses={["bluetooth", "devicelist-inner", "controls"]} halign={END} valign={FILL} spacing={5}>
 						<DeviceControls action="pair" />
 						<DeviceControls action="trust" />
 						<DeviceControls action="connect" />
@@ -158,7 +171,7 @@ function content(device: AstalBluetooth.Device) {
 	);
 }
 
-function BluetoothDevices() {
+function BluetoothDevices({ ...props }: Widget.BoxProps) {
 	const Bluetooth = AstalBluetooth.get_default();
 	const Adapter = Bluetooth.adapter;
 
@@ -180,22 +193,13 @@ function BluetoothDevices() {
 	});
 
 	return (
-		<box cssClasses={["bluetooth", "container"]} name={"Bluetooth"} halign={FILL} valign={FILL} visible={true} vertical={true} spacing={10}>
-			<centerbox
-				cssClasses={["bluetooth", "devicelist-header"]}
-				halign={FILL}
-				valign={CENTER}
-				centerWidget={<label label={"Bluetooth"} />}
-				endWidget={AdapterControls(Bluetooth, Adapter)}
-			/>
-			<Scrollable visible={true}
-				vscrollbar-policy={Gtk.PolicyType.AUTOMATIC}
-				hscrollbar-policy={Gtk.PolicyType.NEVER}
-				hexpand vexpand>
+		<box cssClasses={["bluetooth", "container"]} name={"Bluetooth"} halign={FILL} valign={FILL} visible={true} vertical={true} spacing={10} {...props}>
+			<centerbox cssClasses={["bluetooth", "devicelist-header"]} halign={FILL} valign={CENTER} centerWidget={<label label={"Bluetooth"} />} endWidget={AdapterControls(Bluetooth, Adapter)} />
+			<Gtk.ScrolledWindow visible={true} vscrollbar-policy={Gtk.PolicyType.AUTOMATIC} hscrollbar-policy={Gtk.PolicyType.NEVER} hexpand vexpand>
 				<box cssClasses={["bluetooth", "devicelist-inner"]} halign={FILL} valign={FILL} visible={true} vertical={true} spacing={5}>
 					{btdevicelist}
 				</box>
-			</Scrollable>
+			</Gtk.ScrolledWindow>
 		</box>
 	);
 }

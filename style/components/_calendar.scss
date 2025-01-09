@@ -1,4 +1,4 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 .calendarbox {
 	background: $TertiaryBG;
@@ -37,7 +37,7 @@
 			font-size: 1.75rem;
 		}
 
-		icon {
+		image {
 			font-size: 1.5rem;
 		}
 
@@ -107,5 +107,83 @@
 		color: red;
 		border-radius: $radius;
 		font-weight: bolder;
+	}
+}
+
+calendar {
+	header {
+		label {
+			color: $color3;
+			font-size: 1.5rem;
+		}
+		stack.month {
+			color: $color5;
+		}
+		label.year {
+			color: $color5;
+		}
+	}
+	grid {
+		label {
+			color: $color3;
+			font-size: 1.5rem;
+		}
+		.day-name {
+			color: $color2;
+			box-shadow: inset 0 -0.5rem 0.5rem -0.25rem rgba(15, 155, 255, 0.8);
+			border-bottom: $border;
+			border-radius: $radius;
+		}
+		.week-number {
+			color: $color1;
+		}
+		.day-number {
+			color: $color6;
+		}
+		.other-month {
+			color: $color7;
+		}
+		&:selected {
+			color: black;
+		}
+		.today {
+			background: radial-gradient(rgba(0, 0, 0, 1) 25%, rgba(15, 155, 255, 1) 100%);
+			border-radius: $radius;
+			font-weight: bolder;
+
+			&.day-name {
+				color: red;
+			}
+			&.week-number {
+				color: yellow;
+			}
+			&.day-number {
+				color: red;
+			}
+			.other-month {
+			}
+		}
+	}
+}
+.return-today {
+	color: $color1;
+	background: $BGG5;
+	border-radius: $radius;
+	min-width: 50px;
+	min-height: 30px;
+	padding: 0.25rem 0.5rem;
+
+	image {
+		font-size: 1.25rem;
+		padding: 0.25rem 1.5rem;
+	}
+
+	&:hover {
+		background: $BGG3;
+
+		image {
+			color: $color3;
+			animation: spin 1s infinite;
+		}
 	}
 }

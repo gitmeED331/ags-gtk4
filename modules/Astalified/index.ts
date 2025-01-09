@@ -8,7 +8,7 @@ import ListBoxRow from "./ListBoxRow";
 // import Notebook from "./NoteBook";
 import RegularWindow from "./RegularWindow";
 // import SearchEntry from "./SearchEntry";
-import Scrollable from "./Scrollable";
+import ScrolledWindow from "./Scrollable";
 import Spinner from "./Spinner";
 import Stack from "./Stack";
 import StackSidebar from "./StackSideBar";
@@ -26,7 +26,7 @@ export {
 	// Notebook,
 	RegularWindow,
 	// SearchEntry,
-	Scrollable,
+	ScrolledWindow,
 	Spinner,
 	Stack,
 	StackSidebar,

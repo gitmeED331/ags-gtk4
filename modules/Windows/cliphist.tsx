@@ -1,13 +1,14 @@
 import { Astal, Gtk, Gdk, App } from "astal/gtk4";
 import { execAsync, exec, Variable, bind } from "astal";
 import Pango from "gi://Pango";
-import { Grid, Scrollable } from "../Astalified/index";
+import { Grid } from "../Astalified/index";
 import ScreenSizing from "../lib/screensizeadjust";
 import Icon from "../lib/icons";
 import ClickToClose from "../lib/ClickToClose";
 import PopupWindow from "../lib/popupwindow";
 
 const background = `${SRC}/assets/groot-thin-left.png`;
+const WINDOWNAME = `cliphist${App.get_monitors()[0].get_model()}`;
 
 function ClipHistItem(entry: any) {
 	const [id, ..._content] = entry.split("\t");
@@ -23,16 +24,7 @@ function ClipHistItem(entry: any) {
 	function revealer() {
 		return (
 			<revealer transition_type={REVEAL_SLIDE_DOWN} reveal_child={bind(imageReveal)}>
-				<box
-					cssClasses={["imagePreview"]}
-					halign={FILL}
-					valign={START}
-					css={`
-						background-image: url("${isImage ? filePath : null}");
-					`}
-					widthRequest={filePath ? 300 : 0}
-					heightRequest={filePath ? 200 : 0}
-				/>
+				<image cssClasses={["imagePreview"]} halign={FILL} valign={START} file={`file://${filePath}`} widthRequest={filePath ? 300 : 0} heightRequest={filePath ? 200 : 0} />
 			</revealer>
 		);
 	}
@@ -42,19 +34,22 @@ function ClipHistItem(entry: any) {
 
 	const createButton = (id: string, content: string) => (
 		<button
-			cssClasses={["cliphist item"]}
+			cssClasses={["cliphist", "item"]}
 			valign={START}
 			halign={FILL}
-			on_clicked={(_, event) => {
-				if (event.button === Gdk.BUTTON_PRIMARY) {
+			onButtonPressed={(_, event) => {
+				const win = App.get_window(WINDOWNAME);
+				if (event.get_button() === Gdk.BUTTON_PRIMARY) {
 					if (isImage && filePath) {
 						imageReveal.set(!imageReveal.get());
 					}
 				}
-
-				if (event.button === Gdk.BUTTON_SECONDARY) {
+			}}
+			onButtonReleased={(_, event) => {
+				const win = App.get_window(WINDOWNAME);
+				if (win && event.get_button() === Gdk.BUTTON_SECONDARY) {
 					execAsync(`bash -c "cliphist decode ${id} | wl-copy"`);
-					App.toggle_window(`cliphist${App.get_monitors()[0]}`);
+					win.visible = !win.visible;
 				}
 			}}
 		>
@@ -117,7 +112,12 @@ const input = (
 const list = await execAsync("cliphist list");
 async function updateList(scrollableList: Gtk.Box) {
 	// scrollableList.get_children().forEach((child) => child.destroy());
-	scrollableList.get_child_visible()?.destroy();
+	while (scrollableList.observe_children().get_n_items() > 0) {
+		const child = scrollableList.observe_children().get_item(0) as Gtk.Widget;
+		if (child) {
+			child.unparent();
+		}
+	}
 	const list = await execAsync("cliphist list");
 	list
 		.split("\n")
@@ -131,42 +131,42 @@ await updateList(scrollableList);
 function ClipHistWidget() {
 	const header = () => {
 		const clear = (
-			<button
+			<image
 				cssClasses={["clear_hist"]}
-				valign={CENTER}
-				on_clicked={async () => {
+				iconName={Icon.cliphist.delete}
+				onButtonPressed={async () => {
 					await execAsync("cliphist wipe");
 					query = "";
 					await updateList(scrollableList);
 				}}
-			>
-				<image iconName={Icon.cliphist.delete} halign={FILL} valign={FILL} />
-			</button>
+				halign={FILL}
+				valign={FILL}
+			/>
 		);
 		const refresh = (
-			<button
+			<image
 				cssClasses={["refresh_hist"]}
-				valign={CENTER}
-				onClicked={async () => {
+				iconName={Icon.ui.refresh}
+				halign={FILL}
+				valign={FILL}
+				onButtonPressed={async () => {
 					query = "";
 					input.set_text("");
 					await updateList(scrollableList);
 				}}
-			>
-				<image iconName={Icon.ui.refresh} halign={FILL} valign={FILL} />
-			</button>
+			/>
 		);
 		return (
-			<box cssClasses={["cliphist header"]} spacing={5}>
+			<box cssClasses={["cliphist", "header"]} spacing={5}>
 				{[input, clear, refresh]}
 			</box>
 		);
 	};
 
 	return (
-		<box orientation={Gtk.Orientation.VERTICAL} cssClasses={["cliphist container"]} halign={FILL} valign={FILL}>
+		<box vertical cssClasses={["cliphist", "container"]} halign={FILL} valign={FILL}>
 			<Grid
-				cssClasses={["cliphist contentgrid"]}
+				cssClasses={["cliphist", "contentgrid"]}
 				halign={FILL}
 				valign={FILL}
 				hexpand={true}
@@ -174,24 +174,26 @@ function ClipHistWidget() {
 				visible={true}
 				// width_request={winwidth(0.25)}
 				// height_request={winheight(0.98)}
-				css={`
-					background-image: url("${background}");
-					background-size: contain;
-					background-repeat: no-repeat;
-					background-position: center;
-					background-color: rgba(0, 0, 0, 1);
-				`}
 				setup={(self) => {
 					self.attach(header(), 0, 0, 1, 1);
 					self.attach(
-						<Scrollable halign={FILL} valign={FILL} vexpand={true}>
+						<Gtk.ScrolledWindow halign={FILL} valign={FILL} vexpand={true}>
 							{scrollableList}
-						</Scrollable>,
+						</Gtk.ScrolledWindow>,
 						0,
 						1,
 						1,
 						1,
 					);
+
+					App.apply_css(`
+						.contentgrid {
+						background-image: url("${background}");
+						background-size: contain;
+						background-repeat: no-repeat;
+						background-position: center;
+						background-color: rgba(0, 0, 0, 1);
+					}`);
 				}}
 			/>
 		</box>
@@ -199,8 +201,6 @@ function ClipHistWidget() {
 }
 
 export default function cliphist(monitor: Gdk.Monitor) {
-	const WINDOWNAME = `cliphist${monitor.get_model()}`;
-
 	App.connect("window-toggled", async () => {
 		const win = App.get_window(WINDOWNAME);
 		if (win && win.name === WINDOWNAME) {
@@ -231,7 +231,7 @@ export default function cliphist(monitor: Gdk.Monitor) {
 			keymode={Astal.Keymode.EXCLUSIVE}
 			visible={false}
 			anchor={TOP | BOTTOM | RIGHT | LEFT}
-			onKeyPressEvent={(_, keyval) => {
+			onKeyReleased={(_, keyval) => {
 				const win = App.get_window(WINDOWNAME);
 				if (keyval === Gdk.KEY_Escape && win?.visible) {
 					win.visible = false;
@@ -239,7 +239,7 @@ export default function cliphist(monitor: Gdk.Monitor) {
 			}}
 		>
 			<Grid
-				cssClasses={["cliphist mastergrid"]}
+				cssClasses={["cliphist", "mastergrid"]}
 				halign={FILL}
 				valign={FILL}
 				hexpand={true}

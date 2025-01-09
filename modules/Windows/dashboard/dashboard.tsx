@@ -7,9 +7,10 @@ import { Tray } from "../../Widgets/index";
 import playerStack, { dashboardPlayerStack } from "../../Widgets/MediaPlayer";
 import LeftSide, { dashboardLeftStack } from "./LeftSide";
 import RightSide, { dashboardRightStack } from "./RightSide";
+import CTC from "../../lib/ClickToClose";
 
 export default function Dashboard(monitor: Gdk.Monitor) {
-	const WINDOWNAME = `dashboard${monitor.get_model()}`;
+	const WINDOWNAME = `dashboard${App.get_monitors()[0].get_model()}`;
 
 	App.connect("window-toggled", () => {
 		const win = App.get_window(WINDOWNAME);
@@ -17,11 +18,11 @@ export default function Dashboard(monitor: Gdk.Monitor) {
 			dashboardLeftStack.set_visible_child_name("calendar");
 			dashboardRightStack.set_visible_child_name("notifications");
 			if (
-				dashboardPlayerStack.get_visible_child_name() !== "org.mpris.MediaPlayer2.Deezer" &&
+				dashboardPlayerStack.get_child_by_name("org.mpris.MediaPlayer2.Deezer") &&
 				dashboardPlayerStack.get_visible_child_name() !== "no-media" &&
-				(dashboardPlayerStack as any).length > 0
+				dashboardPlayerStack.observe_children().get_n_items() > 0
 			) {
-				dashboardPlayerStack.set_visible_child_name("org.mpris.MediaPlayer2.Deezer");
+				// dashboardPlayerStack.set_visible_child_name("org.mpris.MediaPlayer2.Deezer");
 			}
 		}
 	});
@@ -39,18 +40,24 @@ export default function Dashboard(monitor: Gdk.Monitor) {
 			rowHomogeneous={false}
 			columnHomogeneous={false}
 			setup={(self) => {
+				self.attach(<CTC id={1} width={0.25} height={0.25} windowName={WINDOWNAME} />, 0, 1, 1, 2);
 				// top
-				self.attach(playerStack(), 0, 0, 3, 1);
+				self.attach(Tray(), 1, 0, 2, 1);
+				self.attach(playerStack(), 1, 1, 2, 1);
 
 				// main
-				self.attach(LeftSide(), 0, 1, 1, 1);
-				self.attach(Tray(), 1, 1, 1, 1);
-				self.attach(RightSide(), 2, 1, 1, 1);
+
+				self.attach(LeftSide(), 1, 2, 1, 1);
+				self.attach(RightSide(), 2, 2, 1, 1);
+				self.attach(<CTC id={1} width={0.25} height={0.25} windowName={WINDOWNAME} />, 3, 1, 1, 2);
+
+				// bottom
+				self.attach(<CTC id={1} width={1} height={0.5} windowName={WINDOWNAME} />, 0, 3, 4, 1);
 			}}
 		/>
 	);
 
-	// return <PopupWindow name={WINDOWNAME} exclusivity={Astal.Exclusivity.NORMAL} xcoord={0.2455} ycoord={0} child={Content} transition={REVEAL_SLIDE_DOWN} />;
+	// return <PopupWindow name={WINDOWNAME} exclusivity={Astal.Exclusivity.NORMAL} xcoord={0} ycoord={0} child={Content} transition={REVEAL_SLIDE_DOWN} />;
 
 	return (
 		<window

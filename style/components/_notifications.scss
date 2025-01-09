@@ -1,4 +1,4 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 .notif {
 	.outerbox {
@@ -22,22 +22,17 @@
 			border-bottom: $border;
 			box-shadow: 0rem 0.5rem 0.5rem -0.25rem rgba(15, 155, 255, 0.8);
 			margin-bottom: 0.5rem;
-			padding: 0.25rem 0rem;
+			padding: 0.25rem 0.5rem;
 
-			label {
+			label,
+			image {
 				font-size: 1.1rem;
 				color: $color1;
 			}
 
 			button {
-				color: $color1;
-
-				icon {
-					font-size: 1.1rem;
-				}
-
 				&:hover {
-					icon {
+					image {
 						color: $color5;
 					}
 				}
@@ -75,7 +70,7 @@
 	.icondatetime {
 		padding: 0.5rem;
 
-		icon {
+		image {
 			font-size: 2.5rem;
 		}
 
@@ -119,7 +114,6 @@
 	}
 
 	.level2 {
-
 		&.outerbox {
 			border: 3px dotted rgba(255, 0, 0, 1);
 		}
@@ -133,7 +127,7 @@
 		}
 
 		.icondatetime {
-			icon {
+			image {
 				color: $color4;
 			}
 
@@ -146,7 +140,6 @@
 	}
 
 	.level1 {
-
 		&.outerbox {
 			border: 3px dashed rgba(15, 155, 255, 1);
 		}
@@ -160,7 +153,8 @@
 		}
 
 		.icondatetime {
-			icon {
+			icon,
+			image {
 				color: $color2;
 			}
 
@@ -174,7 +168,6 @@
 
 	.levelundefined,
 	.level0 {
-
 		&.outerbox {
 			border: 3px groove white;
 		}
@@ -188,7 +181,7 @@
 		}
 
 		.icondatetime {
-			icon {
+			image {
 				color: white;
 			}
 		}

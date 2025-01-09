@@ -10,6 +10,7 @@ import { Apps } from "./AppAccess";
 export let query = new Variable<string>("");
 let currentQuery = "";
 
+
 function Search(query: string) {
 	// const ApplicationElement = (app: AstalApps.Application) => (
 	// 	<box spacing={5}>
@@ -124,7 +125,8 @@ const entry = (
 						handleTerminalCommand(query, state);
 					}
 					if (results[0].name.toLowerCase() === query.toLowerCase()) {
-						app.launch();
+						Apps.fuzzy_query(query)?.[0].launch()
+						
 					}
 				}
 			}
