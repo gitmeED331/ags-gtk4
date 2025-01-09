@@ -7,9 +7,9 @@ import Pango from "gi://Pango";
 import AstalNotifd from "gi://AstalNotifd";
 
 export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notification } & Widget.BoxProps) {
-	const urgency = (u: any) => {
+	const urgency = (n: any) => {
 		const { LOW, NORMAL, CRITICAL } = AstalNotifd.Urgency;
-		switch (u.urgency) {
+		switch (n.urgency) {
 			case LOW:
 				return "low";
 			case CRITICAL:
@@ -24,13 +24,20 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 
 	const iconDateTime = (
 		<box cssClasses={["icondatetime"]} vertical={true} valign={CENTER} halign={START} spacing={5}>
-			{/* <image cssClasses={["icon"]} iconName={item.get_app_icon() || item.get_desktop_entry() || Icon.fallback.notification} pixelSize={60} valign={FILL} halign={FILL} /> */}
-			{n.image && fileExists(n.image) && (
+			{n.image && fileExists(n.image) ? (
 				<image
-					iconName={n.image}
+				cssClasses={["icon"]}
+					file={n.image}
+					iconName={n.appIcon || Icon.fallback.notification}
+					pixelSize={60}
+					valign={START}
+				/>
+			) : (
+				<image
+					iconName={n.appIcon || Icon.fallback.notification}
+					pixelSize={60}
 					valign={START}
 					cssClasses={["icon"]}
-					// css={`background-image: url('${n.image}')`}
 				/>
 			)}
 			<box vertical={true} cssClasses={["datetime"]}>
@@ -66,13 +73,13 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 	);
 
 	return (
-		<box {...boxprops}>
+		<box {...boxprops} cssClasses={["notif"]}>
 			<Grid
-				cssClasses={[`level${urgency(n)}`, "outerbox"]}
+				cssClasses={[`${urgency(n)}`, "outerbox"]}
 				halign={FILL}
 				valign={FILL}
 				hexpand
-				vexpand
+				vexpand 
 				visible={true}
 				rowSpacing={5}
 				setup={(self) => {

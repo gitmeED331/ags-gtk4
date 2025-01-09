@@ -1,0 +1,55 @@
+App.start({
+   css: getCss(),
+   instanceName: "main",
+
+   main() {
+      let bar: Widget.Window | undefined;
+      let notificationsOverview: Widget.Window | undefined;
+      let notificationsPopup: Widget.Window | undefined;
+      let appLauncher: Widget.Window | undefined;
+      let powerMenu: Widget.Window | undefined;
+
+      function onMonitorsChanged() {
+         bar?.destroy();
+         notificationsOverview?.destroy();
+         notificationsPopup?.destroy();
+         appLauncher?.destroy();
+         powerMenu?.destroy();
+
+         bar = undefined;
+         notificationsOverview = undefined;
+         notificationsPopup = undefined;
+         appLauncher = undefined;
+         powerMenu = undefined;
+
+         const monitors = App.get_monitors();
+
+         if (!monitors) {
+            return;
+         }
+
+         for (const monitor of monitors) {
+            if (!monitor) {
+               continue;
+            }
+
+            bar = Bar(monitor);
+            notificationsOverview = NotificationsOverview(monitor);
+            notificationsPopup = NotificationsPopup(monitor);
+            appLauncher = AppLauncher(monitor);
+            powerMenu = PowerMenu(monitor);
+
+            App.add_window(notificationsOverview);
+            App.add_window(notificationsPopup);
+            App.add_window(appLauncher);
+            App.add_window(powerMenu);
+         }
+      }
+
+      onMonitorsChanged();
+
+      App.connect("notify::monitors", () => {
+         onMonitorsChanged();
+      });
+   },
+});

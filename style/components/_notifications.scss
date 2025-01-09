@@ -69,7 +69,7 @@
 
 	.icondatetime {
 		padding: 0.5rem;
-
+		.icon,
 		image {
 			font-size: 2.5rem;
 		}
@@ -112,7 +112,7 @@
 			}
 		}
 	}
-
+	.critical,
 	.level2 {
 		&.outerbox {
 			border: 3px dotted rgba(255, 0, 0, 1);
@@ -127,6 +127,7 @@
 		}
 
 		.icondatetime {
+			.icon,
 			image {
 				color: $color4;
 			}
@@ -138,7 +139,7 @@
 			}
 		}
 	}
-
+	.normal,
 	.level1 {
 		&.outerbox {
 			border: 3px dashed rgba(15, 155, 255, 1);
@@ -153,7 +154,7 @@
 		}
 
 		.icondatetime {
-			icon,
+			.icon,
 			image {
 				color: $color2;
 			}
@@ -167,6 +168,7 @@
 	}
 
 	.levelundefined,
+	.low,
 	.level0 {
 		&.outerbox {
 			border: 3px groove white;
@@ -181,8 +183,15 @@
 		}
 
 		.icondatetime {
+			.icon,
 			image {
 				color: white;
+			}
+
+			.datetime {
+				label {
+					color: white;
+				}
 			}
 		}
 	}
