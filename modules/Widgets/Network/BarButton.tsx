@@ -5,18 +5,18 @@ import { EthernetWidget, Wifi } from "../../Widgets/index";
 
 let netreveal = Variable(false);
 const wifi = AstalNetwork.get_default().wifi;
-const btnspace = 43;
+const btnspace = 40;
 const maxAps = 5;
-const widheight = Variable.derive([bind(wifi, "accessPoints")], (aps) => (aps.length > 0 ? btnspace * Math.min(maxAps, aps.length) : 0));
+const widheight = Variable.derive([bind(wifi, "accessPoints")], (aps) => (aps.length > 0 ? btnspace * Math.min(maxAps, aps.length) : 1));
 
 export const popped = (
 	<popover
-		cssClasses={["popped"]}
 		position={Gtk.PositionType.BOTTOM}
 		hexpand={false}
 		onDestroy={(self) => {
 			self.unparent();
 		}}
+		// hasArrow
 	>
 		<box cssClasses={["network"]} vertical spacing={10} widthRequest={350} heightRequest={bind(widheight).as((h) => h)}>
 			<EthernetWidget />
@@ -63,7 +63,7 @@ function NetworkWidget({ network }: { network: AstalNetwork.Network }) {
 				tooltip.set_custom(theTooltip);
 				return true;
 			}}
-			spacing={5}
+			spacing={bind(netreveal).as((nv) => (nv ? 5 : 0))}
 		>
 			<image iconName={bind(Bindings).as((i) => i.icon)} />
 			<revealer transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT} reveal_child={bind(netreveal)}>
@@ -73,7 +73,7 @@ function NetworkWidget({ network }: { network: AstalNetwork.Network }) {
 	);
 }
 
-function NetworkButton() {
+export default function () {
 	const Network = AstalNetwork.get_default();
 
 	return (
@@ -100,10 +100,9 @@ function NetworkButton() {
 			setup={(self) => {
 				popped.set_parent(self);
 			}}
+			overflow={Gtk.Overflow.HIDDEN}
 		>
 			<NetworkWidget network={Network} />
 		</button>
 	);
 }
-
-export default NetworkButton;

@@ -1,6 +1,10 @@
 @use "../_variables" as *;
 
 .notif {
+	.window {
+		padding-bottom: 2rem;
+		background: red;
+	}
 	.outerbox {
 		background: $TertiaryBG;
 		border-radius: $radius;
@@ -9,13 +13,8 @@
 	}
 
 	&.panel {
-		//margin-top: 0.25rem;
 		padding: 0rem 0.5rem;
 		padding-bottom: 0.25rem;
-		// background: $TertiaryBG;
-		// border-radius: $radius-rlbottom;
-		// border: $border;
-		// border-top: none;
 
 		.header {
 			border-radius: $radius;
@@ -69,10 +68,6 @@
 
 	.icondatetime {
 		padding: 0.5rem;
-		.icon,
-		image {
-			font-size: 2.5rem;
-		}
 
 		.datetime {
 			padding: 0.25rem;
@@ -112,8 +107,7 @@
 			}
 		}
 	}
-	.critical,
-	.level2 {
+	.critical {
 		&.outerbox {
 			border: 3px dotted rgba(255, 0, 0, 1);
 		}
@@ -131,7 +125,10 @@
 			image {
 				color: $color4;
 			}
-
+			.container {
+				border-radius: $radius;
+				border: $border;
+			}
 			.datetime {
 				label {
 					color: $color2;
@@ -139,8 +136,7 @@
 			}
 		}
 	}
-	.normal,
-	.level1 {
+	.normal {
 		&.outerbox {
 			border: 3px dashed rgba(15, 155, 255, 1);
 		}
@@ -158,7 +154,10 @@
 			image {
 				color: $color2;
 			}
-
+			.container {
+				border-radius: $radius;
+				border: $border;
+			}
 			.datetime {
 				label {
 					color: $color2;
@@ -168,8 +167,7 @@
 	}
 
 	.levelundefined,
-	.low,
-	.level0 {
+	.low {
 		&.outerbox {
 			border: 3px groove white;
 		}
@@ -187,7 +185,10 @@
 			image {
 				color: white;
 			}
-
+			.container {
+				border-radius: $radius;
+				border: $border;
+			}
 			.datetime {
 				label {
 					color: white;
@@ -195,9 +196,4 @@
 			}
 		}
 	}
-}
-
-.close-button {
-	font-size: 1.5rem;
-	margin-left: 0.25rem;
 }

@@ -25,11 +25,11 @@ export default function RightSide() {
 
 	dashboardRightStack = rightStack;
 
-	const stackSwitcher = <StackSwitcher cssClasses={["dashboard", "stackSwitcher"]} stack={rightStack} halign={CENTER} valign={START} spacing={10} />;
+	// const stackSwitcher = <StackSwitcher cssClasses={["dashboard", "stackSwitcher"]} stack={rightStack} halign={CENTER} valign={START} spacing={10} />;
 
 	return (
 		<box cssClasses={["dashboard", "rightSide"]} vertical={true} halign={START} valign={START} hexpand={true} vexpand={true} spacing={5} heightRequest={450} widthRequest={450}>
-			{[stackSwitcher, rightStack]}
+			{[/*stackSwitcher,*/ rightStack]}
 		</box>
 	);
 }

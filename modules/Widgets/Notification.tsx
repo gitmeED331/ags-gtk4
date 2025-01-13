@@ -25,20 +25,13 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 	const iconDateTime = (
 		<box cssClasses={["icondatetime"]} vertical={true} valign={CENTER} halign={START} spacing={5}>
 			{n.image && fileExists(n.image) ? (
-				<image
-				cssClasses={["icon"]}
-					file={n.image}
-					iconName={n.appIcon || Icon.fallback.notification}
-					pixelSize={60}
-					valign={START}
-				/>
+				<box cssClasses={["container"]} overflow={Gtk.Overflow.HIDDEN}>
+					<image cssClasses={["icon"]} file={n.image} pixelSize={100} halign={FILL} valign={FILL} />
+				</box>
+			) : n.appIcon && fileExists(n.appIcon) ? (
+				<image iconName={n.appIcon} file={n.appIcon} pixelSize={50} halign={FILL} valign={FILL} cssClasses={["icon"]} />
 			) : (
-				<image
-					iconName={n.appIcon || Icon.fallback.notification}
-					pixelSize={60}
-					valign={START}
-					cssClasses={["icon"]}
-				/>
+				<image iconName={Icon.fallback.notification} pixelSize={50} halign={FILL} valign={FILL} cssClasses={["icon"]} />
 			)}
 			<box vertical={true} cssClasses={["datetime"]}>
 				<DateTimeLabel format="%H:%M" interval={0} />
@@ -79,7 +72,7 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 				halign={FILL}
 				valign={FILL}
 				hexpand
-				vexpand 
+				vexpand
 				visible={true}
 				rowSpacing={5}
 				setup={(self) => {

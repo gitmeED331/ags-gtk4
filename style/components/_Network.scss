@@ -1,5 +1,10 @@
 @use "../_variables" as *;
 
+@keyframes spin {
+	to {
+		--gtk-icon-transform: rotate(1turn);
+	}
+}
 .network {
 	&.barbutton {
 		color: $color1;
@@ -19,34 +24,28 @@
 			}
 		}
 	}
-
-	&.dashboard {
-		// Uncomment if needed
-		// border-radius: $radius-rlbottom;
-		// border: $border;
-		// border-top: none;
-		// background-color: $TertiaryBG;
-	}
 }
 
 .network .ethernet {
 	box-shadow: 0 0.5rem 0.5rem -0.25rem rgba(15, 155, 255, 0.8);
 }
 
-.network .ethernet,
-.network .wifi {
+.ethernet,
+.wifi {
 	&.container {
 		color: $color1;
-		padding: 0.5rem 1rem;
+		padding: 0rem 1rem;
 		border-radius: $radius;
-
 		&.dim {
 			opacity: 0.7;
 		}
 	}
 }
 
-.network .wifi {
+.wifi {
+	.container {
+		min-height: 4rem;
+	}
 	.appassword {
 		min-width: 10px;
 		min-height: 10px;
@@ -64,7 +63,7 @@
 		}
 	}
 
-	&.header {
+	.header {
 		color: $color1;
 		border-radius: $radius;
 		border-bottom: $border;

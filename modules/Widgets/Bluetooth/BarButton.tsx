@@ -11,12 +11,12 @@ const maxDevs = 5;
 const widheight = Variable.derive([bind(Bluetooth, "devices")], (devs) => (devs.length > 0 ? btnspace * Math.min(maxDevs, devs.length) : 0));
 export const popped = (
 	<popover
-		cssClasses={["popped"]}
 		position={Gtk.PositionType.BOTTOM}
 		hexpand={false}
 		onDestroy={(self) => {
 			self.unparent();
 		}}
+		// hasArrow
 	>
 		<BluetoothDevices heightRequest={bind(widheight).as((p) => p)} widthRequest={350} />
 	</popover>
@@ -39,7 +39,7 @@ const BluetoothWidget = (bluetooth: AstalBluetooth.Bluetooth) => {
 	return (
 		<box cssClasses={["bluetooth", "barbutton", "content"]} halign={CENTER} valign={CENTER} visible={true}>
 			{bind(bluetooth, "is_powered").as((showLabel) => (
-				<box>
+				<box spacing={bind(btreveal).as((bt) => (bt ? 5 : 0))}>
 					<image cssClasses={["bluetooth", "barbutton-icon"]} iconName={bind(bluetooth, "is_powered").as((v) => (v ? Icon.bluetooth.enabled : Icon.bluetooth.disabled))} />
 					<revealer transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT} reveal_child={bind(btreveal)}>
 						<label
@@ -93,6 +93,7 @@ export default function BluetoothButton() {
 			setup={(self) => {
 				popped.set_parent(self);
 			}}
+			overflow={Gtk.Overflow.HIDDEN}
 		>
 			{BluetoothWidget(Bluetooth)}
 		</button>

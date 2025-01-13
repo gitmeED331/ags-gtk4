@@ -2,7 +2,6 @@ import { Gdk, Gtk, App, Astal } from "astal/gtk4";
 import { bind, Variable, execAsync } from "astal";
 import AstalWp from "gi://AstalWp";
 import Icon from "../lib/icons";
-import { dashboardLeftStack } from "../Windows/dashboard/LeftSide";
 import AudioMixer from "./AudioMixer";
 
 const TRANSITION = 300;
@@ -15,6 +14,7 @@ export const popped = (
 		onDestroy={(self) => {
 			self.unparent();
 		}}
+		hasArrow
 	>
 		<AudioMixer />
 	</popover>
@@ -29,8 +29,8 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 				mic: isMuted ? "Muted" : `${description} \n Volume ${(volume * 100).toFixed(2)}%`,
 			}[type],
 			buttonCN: {
-				speaker: isMuted || volume === 0 ? "muted" : "",
-				mic: isMuted || volume === 0 ? "muted" : "",
+				speaker: ["audio-mixer", "volume-indicator", isMuted || volume === 0 ? "muted" : ""],
+				mic: ["audio-mixer", "volume-indicator", isMuted || volume === 0 ? "muted" : ""],
 			}[type],
 			theIcon: {
 				speaker: isMuted || volume === 0 ? Icon.audio.speaker.muted : volumeIcon,
@@ -50,12 +50,7 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 	function theTooltip() {
 		return (
 			<box spacing={10}>
-				<image
-					iconName={bind(Bindings).as((c) => c.theIcon)}
-					// css={`
-					// 	font-size: 2rem;
-					// `}
-				/>
+				<image iconName={bind(Bindings).as((c) => c.theIcon)} />
 				<label label={bind(Bindings).as((l) => l.tooltip)} />
 			</box>
 		);
@@ -84,13 +79,7 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 
 	return (
 		<button
-			cssClasses={[
-				"audio-mixer",
-				"volume-indicator",
-				bind(Bindings)
-					.as((c) => c.buttonCN)
-					.get(),
-			]}
+			cssClasses={bind(Bindings).as((c) => c.buttonCN)}
 			hasTooltip
 			// tooltip_text={bind(Bindings).as((c) => c.tooltip)}
 			onQueryTooltip={(self, x, y, kbtt, tooltip) => {
@@ -121,7 +110,6 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 			// }}
 			setup={(self) => {
 				self.add_controller(scrollController);
-				popped.set_parent(self);
 			}}
 		>
 			<image iconName={bind(Bindings).as((c) => c.theIcon)} />
@@ -134,7 +122,7 @@ export default function () {
 	const Microphone = audio.get_default_microphone();
 
 	return (
-		<box spacing={5} halign={CENTER} valign={CENTER}>
+		<box spacing={2.5} halign={CENTER} valign={CENTER} setup={(self) => popped.set_parent(self)}>
 			<Indicator device={Speaker!} type={"speaker"} />
 			{/* <revealer transitionType={Gtk.RevealerTransitionType.SLIDE_RIGHT}				transitionDuration={TRANSITION} clickThrough={true} revealChild={bind(REVEALMIC)}> */}
 			<Indicator device={Microphone!} type={"mic"} />

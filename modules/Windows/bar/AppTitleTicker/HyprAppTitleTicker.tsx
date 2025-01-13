@@ -13,12 +13,12 @@ export default function AppTitleTicker() {
 			// visible={bind(focusedTitle).as(i => i !== "" ? true : false)}
 			visible={true}
 			onButtonPressed={(_, event) => {
-				if (event.get_button() === Gdk.BUTTON_PRIMARY) {
-					const win = App.get_window(`overview${App.get_monitors()[0].get_model()}`);
-					if (win) {
-						win.visible = !win.visible;
-					}
-				}
+				// if (event.get_button() === Gdk.BUTTON_PRIMARY) {
+				// 	const win = App.get_window(`overview${App.get_monitors()[0].get_model()}`);
+				// 	if (win) {
+				// 		win.visible = !win.visible;
+				// 	}
+				// }
 				if (event.get_button() === Gdk.BUTTON_SECONDARY) {
 					bind(hyprland, "focusedClient").as((fc) => fc.kill);
 				}

@@ -1,4 +1,4 @@
-import { Gtk, App } from "astal/gtk4";
+import { Gdk, Gtk, App } from "astal/gtk4";
 import { execAsync } from "astal";
 // import { Icons } from "../../lib/icons";
 import { Apps, Applications, AstalApplication } from "./AppAccess";
@@ -20,11 +20,17 @@ export default function FavoritesBar({ favorites }: any) {
 							win.visible = !win.visible;
 						}
 					}}
-					onKeyPressed={() => {
+					onKeyPressed={(_, keyval) => {
 						const win = App.get_window(`launcher${App.get_monitors()[0].get_model()}`);
 						if (win) {
-							app.launch();
-							win.visible = !win.visible;
+							if (keyval === Gdk.KEY_Return) {
+								app.launch();
+								win.visible = !win.visible;
+							}
+							if (keyval === Gdk.KEY_KP_Enter) {
+								app.launch();
+								win.visible = !win.visible;
+							}
 						}
 					}}
 				>

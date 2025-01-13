@@ -86,11 +86,6 @@
 }
 
 .popped {
-	border-radius: calc($radius * 1.25);
-	border: $border;
-	padding: 1rem;
-	background: $SecondaryBG;
-
 	.power {
 		all: unset;
 

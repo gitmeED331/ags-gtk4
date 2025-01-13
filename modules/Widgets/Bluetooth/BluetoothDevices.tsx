@@ -195,7 +195,7 @@ function BluetoothDevices({ ...props }: Widget.BoxProps) {
 	return (
 		<box cssClasses={["bluetooth", "container"]} name={"Bluetooth"} halign={FILL} valign={FILL} visible={true} vertical={true} spacing={10} {...props}>
 			<centerbox cssClasses={["bluetooth", "devicelist-header"]} halign={FILL} valign={CENTER} centerWidget={<label label={"Bluetooth"} />} endWidget={AdapterControls(Bluetooth, Adapter)} />
-			<Gtk.ScrolledWindow visible={true} vscrollbar-policy={Gtk.PolicyType.AUTOMATIC} hscrollbar-policy={Gtk.PolicyType.NEVER} hexpand vexpand>
+			<Gtk.ScrolledWindow cssClasses={["bluetooth", "devicelist-outer"]} visible={true} vscrollbar-policy={Gtk.PolicyType.AUTOMATIC} hscrollbar-policy={Gtk.PolicyType.NEVER} hexpand vexpand>
 				<box cssClasses={["bluetooth", "devicelist-inner"]} halign={FILL} valign={FILL} visible={true} vertical={true} spacing={5}>
 					{btdevicelist}
 				</box>

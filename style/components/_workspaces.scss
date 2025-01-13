@@ -49,14 +49,10 @@
 
 	button {
 		color: $color1;
-		transition: all 2s cubic-bezier(0.5, 2, 0, 1);
-		image {
-			.large-icons {
-				font-size: 0.8rem;
-			}
-		}
+		/* transition: all 2s cubic-bezier(0.5, 2, /0, 1); */
+
 		label {
-			font-size: 0.9rem;
+			font-size: 0.6rem;
 		}
 
 		&:first-child {

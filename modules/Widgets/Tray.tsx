@@ -28,6 +28,7 @@ function createMenu(menuModel: Gio.MenuModel, actionGroup: Gio.ActionGroup): Gtk
 	const menu: Gtk.PopoverMenu = Gtk.PopoverMenu.new_from_model(menuModel);
 	menu.insert_action_group("dbusmenu", actionGroup);
 	menu.set_css_classes(["menu"]);
+	menu.has_arrow = false;
 	return menu;
 }
 
@@ -41,7 +42,7 @@ const SysTrayItem = (item: TrayItem) => {
 			cssClasses={["systray-item"]}
 			halign={CENTER}
 			valign={CENTER}
-			tooltip_markup={bind(item, "tooltip_markup")}
+			tooltip_markup={bind(item, "tooltip_markup").as((t) => t)}
 			use_underline={false}
 			onButtonPressed={(self, event) => {
 				if (event.get_button() === Gdk.BUTTON_PRIMARY) {
@@ -54,13 +55,12 @@ const SysTrayItem = (item: TrayItem) => {
 						clickTimeout.cancel();
 						clickCount = 0;
 						item.activate(0, 0);
-						App.toggle_window(`dashboard${App.get_monitors()[0].get_model()}`);
 					}
 				}
 				if (event.get_button() === Gdk.BUTTON_SECONDARY) {
 					menu.set_position(Gtk.PositionType.BOTTOM);
 					menu.set_parent(self);
-					menu.show();
+					menu.popup();
 				}
 			}}
 		>

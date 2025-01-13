@@ -126,9 +126,9 @@ export default function WifiAP({ ap, wifi }: { ap: any; wifi: AstalNetwork.Wifi 
 			}[action],
 
 			classname: {
-				connect: "connect",
-				disconnect: "disconnect",
-				forget: "forget",
+				connect: ["wifi", "ap", "connect"],
+				disconnect: ["wifi", "ap", "disconnect"],
+				forget: ["wifi", "ap", "forget"],
 			}[action],
 
 			content: {
@@ -140,10 +140,10 @@ export default function WifiAP({ ap, wifi }: { ap: any; wifi: AstalNetwork.Wifi 
 
 		return (
 			<button
-				cssClasses={["wifi", "ap", bind(Bindings).get().classname]}
+				cssClasses={bind(Bindings).as((c) => c.classname)}
 				onButtonPressed={(_, event) => {
 					if (event.get_button() === Gdk.BUTTON_PRIMARY) {
-						Bindings.get().command();
+						bind(Bindings).as((b) => b.command);
 					}
 				}}
 				tooltip_markup={bind(Bindings).as((b) => b.tooltip)}
@@ -170,7 +170,7 @@ export default function WifiAP({ ap, wifi }: { ap: any; wifi: AstalNetwork.Wifi 
 				valign={FILL}
 				startWidget={<CustomButton action={"connect"} />}
 				endWidget={
-					<box visible={isActiveAP || isConnecting} halign={END}>
+					<box cssClasses={["wifi", "ap", "controls"]} visible={isActiveAP || isConnecting} halign={END}>
 						{isConnecting ? (
 							<box halign={END}>
 								<Spinner name={"connectionSpinner"} setup={(self) => (isConnecting ? self.start() : self.stop())} halign={CENTER} valign={CENTER} />

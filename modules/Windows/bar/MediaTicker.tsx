@@ -18,8 +18,9 @@ export const popped = (
 		onDestroy={(self) => {
 			self.unparent();
 		}}
+		hasArrow
 	>
-		{playerStack()}
+		{playerStack({ cssName: "popupplayer" })}
 	</popover>
 ) as Gtk.Popover;
 

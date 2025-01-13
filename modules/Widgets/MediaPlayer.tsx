@@ -121,13 +121,7 @@ function Player(player: Mpris.Player) {
 			(playbackStatus, entry, identity, can_go_previous, can_play, can_go_next) => ({
 				command: {
 					activePlay: () => {
-						const dwin = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
 						execAsync(`bash -c '${player.entry}'`);
-						if (dwin && dwin.visible === true) {
-							dwin.visible = false;
-						} else if (popped && popped.visible) {
-							popped.popdown();
-						}
 					},
 					play_pause: () => {
 						return player.play_pause();
@@ -275,11 +269,12 @@ function Player(player: Mpris.Player) {
 export let dashboardPlayerStack: Gtk.Stack;
 export let windowPlayerStack: Gtk.Stack;
 
-export default function playerStack() {
+export default function playerStack({ cssName }: { cssName: string }) {
 	const mpris = Mpris.get_default();
 
 	const theStack = (
 		<stack
+			cssClasses={[cssName]}
 			visible={true}
 			transitionType={Gtk.StackTransitionType.SLIDE_LEFT_RIGHT}
 			transition_duration={2000}
@@ -326,7 +321,8 @@ export default function playerStack() {
 
 	return (
 		<box halign={CENTER} valign={CENTER} vertical={true} visible={bind(mpris, "players").as((a) => a.length > 0)} onDestroy={(self) => self.unparent()}>
-			{[switcher, theStack]}
+			{switcher}
+			{theStack}
 		</box>
 	);
 }

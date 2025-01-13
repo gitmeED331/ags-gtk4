@@ -1,42 +1,43 @@
 @use "../_variables" as *;
 
 @keyframes blink {
-    0% {
-        opacity: 0;
-    }
-    50% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 0;
-    }
+	0% {
+		opacity: 0;
+	}
+
+	50% {
+		opacity: 1;
+	}
+
+	100% {
+		opacity: 0;
+	}
 }
 
 .screenshot {
- &.popped {
-    .container{
-  button {
-    color: $color1;
-    &:hover {
-      color: $color5;
-    }
-  }
+	button {
+		color: $color1;
+		&:hover {
+			color: $color5;
+		}
+	}
+	.barcontainer {
+		color: $color1;
+		button {
+			color: $color1;
+		}
+		.barbutton {
+			color: $color1;
+			&.active {
+				color: $color5;
+			}
+		}
+	}
 }
- }
- .barcontainer {
-    color: $color1;
-    button {
-        color: $color1;
-    }
-    .barbutton {
-        color: $color1;
-        &.active {
-            color: $color5;
-        }
-        .wfrecorder {
-            animation: blink 1s infinite;
-        }
-        &-tooltip {}
-    }
-}
+.wfrecorder {
+	animation: blink 1s infinite;
+
+	&:hover {
+		color: $color5;
+	}
 }

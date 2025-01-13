@@ -1,0 +1,14 @@
+@use "../_variables" as *;
+
+popover {
+	arrow {
+		background: $SecondaryBG;
+		border: $border;
+	}
+	contents {
+		padding: 0.75rem;
+		border: $border;
+		border-radius: $radius;
+		background: $SecondaryBG;
+	}
+}

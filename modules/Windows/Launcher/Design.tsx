@@ -29,27 +29,34 @@ export function CreateAppGrid({ appList }: { appList: AstalApplication[] }) {
 	);
 
 	function createAppButton(app: AstalApplication) {
+		const command = (win: any) => [app.launch(), (win.visible = !win.visible)];
+
 		return (
 			<button
+				widthRequest={ScreenSizing({ type: "width", multiplier: 0.2 })}
 				cssClasses={["launcher", "app"]}
 				name={app.get_name()}
 				tooltip_text={app.get_description()}
 				onButtonPressed={(_, event) => {
 					const win = App.get_window(WINDOWNAME);
 					if (win && event.get_button() === Gdk.BUTTON_PRIMARY) {
-						app.launch();
-						win.visible = !win.visible;
+						command(win);
 					}
 				}}
 				onKeyPressed={(_, keyval) => {
 					const win = App.get_window(WINDOWNAME);
-					if ((win && keyval === Gdk.KEY_Return) || (win && keyval === Gdk.KEY_KP_Enter)) {
-						app.launch();
-						win.visible = !win.visible;
+					if (win) {
+						if (keyval === Gdk.KEY_Return) {
+							command(win);
+						}
+						if (keyval === Gdk.KEY_KP_Enter) {
+							command(win);
+						}
 					}
 				}}
+				canFocus
 			>
-				<box halign={FILL} valign={FILL} spacing={5} widthRequest={ScreenSizing({ type: "width", multiplier: 0.2 })}>
+				<box halign={FILL} valign={FILL} spacing={5}>
 					<image iconName={app.get_icon_name()} pixelSize={30} halign={CENTER} valign={CENTER} />
 					<box vertical>
 						<label label={app.get_name()} cssClasses={["appname"]} halign={START} valign={CENTER} maxWidthChars={30} lines={1} wrap={true} xalign={0} yalign={0} />

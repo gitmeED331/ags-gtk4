@@ -39,7 +39,7 @@ export default function Workspaces() {
 			return (
 				<button
 					cssClasses={bind(Bindings).as((c) => c.classname)}
-					visible={Bindings.as((v) => v.visible)}
+					visible={bind(Bindings).as((v) => v.visible)}
 					valign={CENTER}
 					halign={CENTER}
 					onButtonPressed={(_, event) => {
@@ -58,7 +58,7 @@ export default function Workspaces() {
 						}
 					}}
 				>
-					{Bindings.get().content}
+					{bind(Bindings).as((c) => c.content)}
 				</button>
 			);
 		});

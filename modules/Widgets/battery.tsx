@@ -5,7 +5,6 @@ import powerProfiles from "gi://AstalPowerProfiles";
 import AstalBat from "gi://AstalBattery";
 import { wired, wifi } from "../Widgets/SystemStats/networkstats";
 import systemStats from "../Widgets/SystemStats/systemStats";
-import { dashboardLeftStack } from "../Windows/dashboard/LeftSide";
 import { BrightnessSlider, PowerProfiles } from "./index";
 
 let TRANSITION = 300;
@@ -27,8 +26,8 @@ const BatteryLevelBar = ({ battery, power }: { battery: AstalBat.Device; power: 
 	const theTooltip = (
 		<box cssClasses={["battery-tooltip"]} spacing={10} halign={START}>
 			<box vertical cssClasses={["tooltip", "titles"]} halign={START}>
-				<label label={`Current Battery Level: `} halign={START} />
-				<label label={`Current Profile: `} halign={START} />
+				<label label={`Current Battery Level:`} halign={START} />
+				<label label={`Current Profile:`} halign={START} />
 			</box>
 			<box vertical cssClasses={["tooltip", "values"]} halign={END}>
 				<label label={bind(battery, "percentage").as((p) => `${p * 100}%`)} halign={END} />
@@ -71,6 +70,7 @@ export default function () {
 			onDestroy={(self) => {
 				self.unparent();
 			}}
+			hasArrow
 		>
 			<box vertical spacing={10} cssClasses={["power"]}>
 				<PowerProfiles />
@@ -84,7 +84,7 @@ export default function () {
 			cssClasses={bind(batteryButtonClassName).as((b) => b.classname)}
 			halign={CENTER}
 			valign={CENTER}
-			spacing={3}
+			spacing={bind(Bat, "charging").as((c) => (c ? 3 : 0))}
 			onButtonPressed={(_, event) => {
 				const buttonType = event.get_button();
 
@@ -106,6 +106,7 @@ export default function () {
 			setup={(self) => {
 				popped.set_parent(self);
 			}}
+			overflow={Gtk.Overflow.HIDDEN}
 		>
 			<TheLabelReveal battery={Bat} charging={bind(Bat, "charging")} />
 			<ChargeIndicatorIcon charging={bind(Bat, "charging")} />

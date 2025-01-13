@@ -46,74 +46,79 @@
 		}
 	}
 
-	&.devicelist-inner {
-		color: $color1;
-		padding: 0.25rem;
+	&.devicelist {
+		&-outer {
+			min-height: 4rem;
+		}
+		&-inner {
+			color: $color1;
+			padding: 0.25rem;
 
-		&.controls {
-			border-radius: $radius;
-			border-left: $border;
-			padding: 0 0.5rem;
-			box-shadow: -0.75rem 0 0.5rem -0.25rem rgba(15, 155, 255, 0.8);
-
-			button {
-				/* all: unset; */
+			&.controls {
 				border-radius: $radius;
-				padding: 0.1rem;
-				image {
-					color: $color1;
-				}
+				border-left: $border;
+				padding: 0 0.5rem;
+				box-shadow: -0.75rem 0 0.5rem -0.25rem rgba(15, 155, 255, 0.8);
 
-				&:hover {
-					label,
+				button {
+					/* all: unset; */
+					border-radius: $radius;
+					padding: 0.1rem;
 					image {
-						color: $color5;
+						color: $color1;
+					}
+
+					&:hover {
+						label,
+						image {
+							color: $color5;
+						}
 					}
 				}
 			}
-		}
-
-		button {
-			&.enabled {
-				color: $color3;
-			}
-
-			&.disabled {
-				color: grey;
-			}
-
-			&:hover {
-				color: $color5;
-			}
-		}
-
-		&.items {
-			border-radius: $radius;
-			border-bottom: $border;
 
 			button {
-				label,
-				image {
-					color: $color1;
+				&.enabled {
+					color: $color3;
+				}
+
+				&.disabled {
+					color: grey;
 				}
 
 				&:hover {
-					label,
-					image {
-						color: $color5;
-					}
+					color: $color5;
 				}
 			}
 
-			&.itemicon {
-				color: $color3;
-			}
+			&.items {
+				border-radius: $radius;
+				border-bottom: $border;
 
-			&.connected {
-				border-color: $color3;
+				button {
+					label,
+					image {
+						color: $color1;
+					}
 
-				label {
+					&:hover {
+						label,
+						image {
+							color: $color5;
+						}
+					}
+				}
+
+				&.itemicon {
 					color: $color3;
+				}
+
+				&.connected {
+					border-color: $color3;
+
+					label {
+						color: $color3;
+					}
 				}
 			}
 		}

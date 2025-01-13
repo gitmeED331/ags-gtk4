@@ -2,9 +2,7 @@ import { Gtk, Gdk, App } from "astal/gtk4";
 import { GLib } from "astal";
 import { StackSwitcher, Stack, StackSidebar, Calendar } from "../../Astalified/index";
 
-import { BrightnessSlider, PowerProfiles, SessionControls } from "../../Widgets/index";
-
-export let dashboardLeftStack: Gtk.Stack;
+// export let dashboardLeftStack: Gtk.Stack;
 
 export default function LeftSide() {
 	const Caly = () => {
@@ -25,15 +23,15 @@ export default function LeftSide() {
 			</button>
 		);
 
-		App.connect("window-toggled", () => {
-			const win = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
-			const today = new Date();
-			if (win) {
-				cal.set_property("year", today.getFullYear());
-				cal.set_property("month", today.getMonth());
-				cal.set_property("day", today.getDate());
-			}
-		});
+		// App.connect("window-toggled", () => {
+		// 	const win = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
+		// 	const today = new Date();
+		// 	if (win) {
+		// 		cal.set_property("year", today.getFullYear());
+		// 		cal.set_property("month", today.getMonth());
+		// 		cal.set_property("day", today.getDate());
+		// 	}
+		// });
 		return (
 			<box halign={FILL} valign={FILL} vertical spacing={5}>
 				{[cal, btn]}
@@ -58,13 +56,13 @@ export default function LeftSide() {
 		/>
 	) as Gtk.Stack;
 
-	const stackSwitcher = <StackSwitcher cssClasses={["dashboard", "stackSwitcher"]} stack={leftStack} halign={CENTER} valign={START} spacing={10} />;
+	// const stackSwitcher = <StackSwitcher cssClasses={["dashboard", "stackSwitcher"]} stack={leftStack} halign={CENTER} valign={START} spacing={10} />;
 
-	dashboardLeftStack = leftStack;
+	// dashboardLeftStack = leftStack;
 
 	return (
 		<box cssClasses={["dashboard", "leftSide"]} vertical halign={END} valign={START} hexpand={true} vexpand={true} spacing={10} widthRequest={450}>
-			{[stackSwitcher, leftStack]}
+			{[/*stackSwitcher*/, leftStack]}
 		</box>
 	);
 }

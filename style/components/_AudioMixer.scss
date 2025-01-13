@@ -2,11 +2,15 @@
 
 .audio-mixer {
 	color: $color1;
-
+	popover {
+		arrow {
+			background: $SecondaryBG;
+		}
+	}
 	&.container {
 		background: $SecondaryBG;
 		border-radius: calc($radius * 1.25);
-		border: $border;
+		/* border: $border; */
 		padding: 1rem;
 
 		.devices,
@@ -91,7 +95,7 @@
 	}
 }
 
-.volumemixer .menu {
+/* .volumemixer .menu {
 	all: unset;
 
 	&.app-mixer,
@@ -113,7 +117,7 @@
 			color: rgba(15, 155, 255, 1);
 		}
 	}
-}
+} */
 
 .mixeritem,
 .sinkitem {

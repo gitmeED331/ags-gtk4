@@ -15,7 +15,7 @@
 	.left,
 	.center,
 	.right {
-		min-width: 10rem;
+		min-width: 1rem;
 	}
 }
 
@@ -53,6 +53,11 @@
 
 /* --- Clock --- */
 .clock {
+	popover {
+		arrow {
+			background: $SecondaryBG;
+		}
+	}
 	background: $PrimaryBG;
 	color: $color1;
 	border-top: $border;
@@ -91,7 +96,7 @@
 	border-radius: 1rem;
 	padding: 0 0.5rem;
 
-	.volumebtn {
+	/* .volumebtn {
 		color: inherit;
 
 		image {
@@ -101,5 +106,5 @@
 		button:hover {
 			color: $color5;
 		}
-	}
+	} */
 }

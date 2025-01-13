@@ -11,11 +11,11 @@ export default function AppTitleTicker() {
 			primarycmd: {
 				focused: focused
 					? () => {
-						const win = App.get_window(`overview${App.get_monitors()[0]}`);
-						if (win) {
-							win.visible = !win.visible;
+							const win = App.get_window(`overview${App.get_monitors()[0]}`);
+							if (win) {
+								win.visible = !win.visible;
+							}
 						}
-					}
 					: "",
 			}[action],
 			secondarycmd: {
@@ -48,7 +48,7 @@ export default function AppTitleTicker() {
 			>
 				<box spacing={5}>
 					{/* <icon icon={Bindings.as((i) => i.icon)} valign={CENTER} halign={CENTER} /> */}
-					<label label={Bindings.as((l) => l.label)} valign={CENTER} halign={CENTER} ellipsize={Pango.EllipsizeMode.END} useMarkup={true} />
+					<label label={bind(Bindings).as((l) => l.label)} valign={CENTER} halign={CENTER} ellipsize={Pango.EllipsizeMode.END} useMarkup={true} />
 				</box>
 			</button>
 		);

@@ -14,12 +14,9 @@ csshotreload;
 // import {
 // 	Bar,
 // 	cliphist,
-// 	Dashboard,
-// 	Launcherflowbox,
 // 	Launchergrid,
-// 	MediaPlayerWindow,
 // 	NotificationPopups,
-// 	// Overview,
+// 	Overview,
 // 	sessioncontrol,
 // 	SystemStats,
 // 	wallpapers,
@@ -32,16 +29,6 @@ import windows from "./modules/Windows/index";
 App.start({
 	requestHandler(request: string, res: (response: any) => void) {
 		for (const monitor of App.get_monitors()) {
-			if (request == "dashboard") {
-				const win = App.get_window(`dashboard${monitor.get_model()}`);
-				if (win && win.visible) {
-					win.visible = false;
-					res("Hiding Dashboard");
-				} else if (win && !win.visible) {
-					win.visible = true;
-					res("Showing Dashboard");
-				}
-			}
 			if (request == "cliphist") {
 				const win = App.get_window(`cliphist${monitor.get_model()}`);
 				if (win && win.visible) {
@@ -60,16 +47,6 @@ App.start({
 				} else if (win && !win.visible) {
 					win.visible = true;
 					res("Hiding Wallpapers");
-				}
-			}
-			if (request == "mediaplayerwindow") {
-				const win = App.get_window(`mediaplayerwindow${monitor.get_model()}`);
-				if (win && win.visible) {
-					win.visible = false;
-					res("Showing mediaplayerwindow");
-				} else if (win && !win.visible) {
-					win.visible = true;
-					res("Hiding mediaplayerwindow");
 				}
 			}
 			if (request == "sessioncontrols") {

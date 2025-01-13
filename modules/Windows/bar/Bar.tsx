@@ -4,6 +4,7 @@ import { GLib, GObject, exec, execAsync, Gio } from "astal";
 import DateTimeLabel from "../../lib/datetime";
 import SysInfo from "./sysinfo";
 import MediaTickerButton from "./MediaTicker";
+import Dashboard from "../../Widgets/dashboard/dashboard";
 
 const wm = GLib.getenv("XDG_CURRENT_DESKTOP")?.toLowerCase();
 
@@ -40,21 +41,16 @@ function LeftBar() {
 
 function CenterBar() {
 	return (
-		<centerbox
-			cssClasses={["center", "clock"]}
-			halign={CENTER}
-			valign={START}
-			onButtonPressed={(_, event) => {
-				const win = App.get_window(`dashboard${App.get_monitors()[0].get_model()}`);
-				if (win) {
-					win.visible = !win.visible;
-				}
-			}}
-		>
-			<DateTimeLabel format="%H:%M:%S" interval={500} halign={START} />
-			<image iconName="nix-snowflake-symbolic" cssClasses={["clock-icon"]} halign={CENTER} />
-			<DateTimeLabel format="%a %b %d" interval={3600000} halign={END} />
-		</centerbox>
+		<menubutton halign={CENTER} valign={START}>
+			<box cssClasses={["center", "clock"]} halign={CENTER} valign={START} spacing={5}>
+				<DateTimeLabel format="%H:%M:%S" interval={500} halign={START} />
+				<image iconName="nix-snowflake-symbolic" cssClasses={["clock-icon"]} halign={CENTER} />
+				<DateTimeLabel format="%a %b %d" interval={3600000} halign={END} />
+			</box>
+			<popover position={Gtk.PositionType.BOTTOM} hasArrow>
+				<Dashboard />
+			</popover>
+		</menubutton>
 	);
 }
 

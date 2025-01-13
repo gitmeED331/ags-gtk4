@@ -1,7 +1,7 @@
 @use "../_variables" as *;
 
 .tray {
-	background: $TertiaryBG;
+	/* background: $TertiaryBG; */
 	border: $border;
 	border-radius: $radius;
 	padding: 0.25rem;
@@ -13,10 +13,8 @@
 	}
 
 	button {
-		image,
-		icon {
+		image {
 			color: $color1;
-			font-size: 1.5rem;
 			border-radius: $radius;
 		}
 
@@ -29,37 +27,56 @@
 }
 
 .menu {
-	background: rgba(0, 0, 0, 1);
-	border-radius: $radius;
-	border: $border;
-	padding: 0.25rem;
-
-	.flat {
-		background: rgba(0, 0, 0, 1);
-		border-radius: $radius;
-		color: $color1;
-		margin: 0.5px;
-		padding-left: 5px;
-
-		&:hover {
-			color: $color5;
-			font-weight: bold;
-			border: $border;
-			border-top: none;
-			border-color: $color4;
+	all: unset;
+	arrow {
+		/* all: unset; */
+		left,
+		right {
+			background: red;
+			color: blue;
 
 			image {
-				color: $color4;
+				background: red;
+				color: blue;
 			}
 		}
-		image {
-			color: $color1;
+	}
+	contents {
+		/* background: rgba(0, 0, 0, 1);
+		border-radius: $radius;
+		border: $border;
+		padding: 0.25rem;
+		color: $color1; */
+		.inline-buttons button.model {
+			color: blue;
 		}
+		.flat {
+			/* background: rgba(0, 0, 0, 1); */
+			border-radius: $radius;
+			color: $color1;
+			margin: 0.5rem;
+			padding-left: 0.5rem;
 
-		&:disabled {
-			color: gray;
-			background: rgba(39, 38, 38, 0.5);
-			border: none;
+			&:hover {
+				color: $color5;
+				font-weight: bold;
+				border: $border;
+				border-top: none;
+				border-color: $color4;
+
+				image {
+					color: $color4;
+				}
+			}
+			image {
+				color: $color1;
+			}
+
+			&:disabled {
+				color: gray;
+				background: rgba(39, 38, 38, 0.5);
+				border: none;
+			}
 		}
 	}
 }
