@@ -15,7 +15,6 @@ function NotifItem() {
 		notificationItem.unparent();
 		expireTime.set(0);
 		waitTime.set(0);
-		// Notif.notify;
 
 		const win = App.get_window(WINDOWNAME);
 		if (win && !box.get_first_child()) {
@@ -36,24 +35,25 @@ function NotifItem() {
 		const notificationItem = (
 			<NotifWidget
 				n={notification}
-onButtonPressed={(_, event) => {
-	switch (event.get_button()) {
-		case Gdk.BUTTON_PRIMARY:
-			removeItem(popupBox, notificationItem);
-			break;
-		case Gdk.BUTTON_SECONDARY:
-			notification.dismiss();
-			break;
-	}
-}}
-onHoverEnter={() => {
-	expireTime.set(0);
-	waitTime.set(0);
-}}
-onHoverLeave={() => {
-	waitTime.set(3000);
-	timeout(waitTime.get(), () => removeItem(popupBox, notificationItem));
-}}
+				onButtonPressed={(_, event) => {
+					switch (event.get_button()) {
+						case Gdk.BUTTON_PRIMARY:
+							removeItem(popupBox, notificationItem);
+							break;
+						case Gdk.BUTTON_SECONDARY:
+							notification.dismiss();
+							break;
+					}
+				}}
+				onHoverEnter={() => {
+					expireTime.set(0);
+					waitTime.set(0);
+					idle;
+				}}
+				onHoverLeave={() => {
+					waitTime.set(3000);
+					timeout(waitTime.get(), () => removeItem(popupBox, notificationItem));
+				}}
 			/>
 		);
 
@@ -83,7 +83,7 @@ export default (monitor: Gdk.Monitor) => {
 
 	return (
 		<window
-name={WINDOWNAME}
+			name={WINDOWNAME}
 			cssClasses={["notifications", "notif", "window"]}
 			hexpand={false}
 			vexpand

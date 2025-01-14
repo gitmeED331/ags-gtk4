@@ -17,14 +17,14 @@ function ClipHistItem(entry: any) {
 	const fileUriPattern = /^file:\/\/(.+\.(jpg|jpeg|png|gif|bmp|webp))$/i;
 	const filePathMatch = content.match(fileUriPattern);
 	const isImage = Boolean(filePathMatch);
-	const filePath = isImage ? filePathMatch[0] : "";
+	const filePath = isImage ? filePathMatch[1] : "";
 
 	let imageReveal = Variable(false);
 
 	function revealer() {
 		return (
 			<revealer transition_type={REVEAL_SLIDE_DOWN} reveal_child={bind(imageReveal)}>
-				<image cssClasses={["imagePreview"]} halign={FILL} valign={START} file={`file://${filePath}`} widthRequest={filePath ? 300 : 0} heightRequest={filePath ? 200 : 0} />
+				<image cssClasses={["imagePreview"]} halign={FILL} valign={START} file={filePath} widthRequest={filePath ? 300 : 0} heightRequest={filePath ? 200 : 0} />
 			</revealer>
 		);
 	}
@@ -67,26 +67,6 @@ function ClipHistItem(entry: any) {
 	);
 
 	const button = createButton(id, content);
-
-	// button.connect("focus", () => {
-	// 	imageReveal.set(false);
-	// });
-
-	// button.connect("notify::focused", () => {
-	// 	if (isImage && filePath) {
-	// 		imageReveal.set(true);
-	// 	}
-	// });
-	// const focusOutHandlerId = button.connect("focus-out-event", () => imageReveal.set(false));
-	// const focusInHandlerId = button.connect("focus-in-event", () => {
-	// 	if (isImage && filePath) imageReveal.set(true);
-	// });
-
-	// Cleanup signal handlers on button destruction
-	// button.connect("destroy", () => {
-	// 	button.disconnect(focusOutHandlerId);
-	// 	button.disconnect(focusInHandlerId);
-	// });
 
 	return button;
 }
@@ -188,7 +168,7 @@ function ClipHistWidget() {
 
 					App.apply_css(`
 						.contentgrid {
-						background-image: url("${background}");
+						background-image: url("file://${background}");
 						background-size: contain;
 						background-repeat: no-repeat;
 						background-position: center;

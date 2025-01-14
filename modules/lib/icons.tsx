@@ -5,8 +5,6 @@ const substitutes = {
 	geany: "geany-symbolic",
 	vivaldi: "vivaldi-symbolic",
 	"vivaldi-stable": "vivaldi-symbolic",
-	"org.kde.konsole": "terminal-symbolic",
-	konsole: "terminal-symbolic",
 	"audio-headset-bluetooth": "audio-headphones-symbolic",
 	"audio-card-analog-usb": "audio-headphones-symbolic",
 	"audio-card-analog-pci": "audio-card-symbolic",
@@ -16,7 +14,6 @@ const substitutes = {
 	"filen-desktop-symbolic": "filen-desktop-symbolic",
 	webcord: "discord-symbolic",
 	"deezer-enhanced-symbolic": "deezer-symbolic",
-	codium: "vs-code-symbolic",
 	"code-oss": "vs-code-symbolic",
 	"kate-symbolic": "geany-symbolic",
 	"org.kde.kate": "codepen-symbolic",
@@ -24,7 +21,8 @@ const substitutes = {
 	"chromium-browser": "chromium-symbolic",
 	ente_auth: "auth-icon-symbolic",
 	signal: "signal-symbolic",
-	rofi: "rofi-symbolic",
+	"rofi": "rofi-symbolic",
+	"Windsurf": "vs-code-symbolic",
 };
 
 const Icon = {

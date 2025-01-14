@@ -49,9 +49,10 @@ export default function Launchergrid(monitor: Gdk.Monitor) {
 
 				App.apply_css(`.launcher.contentgrid {
 						background-image: url("file://${background}");
-						background-color: black;
+						background-color: rgba(0, 0, 0, 1);
 						background-size: contain;
 						background-position: center;
+						background-repeat: no-repeat;
 						}`);
 			}}
 		/>

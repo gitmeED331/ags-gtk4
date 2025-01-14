@@ -1,5 +1,5 @@
 import { Gdk, Gtk, Widget } from "astal/gtk4";
-import { GLib } from "astal";
+import { GLib, bind } from "astal";
 import Icon from "../lib/icons";
 import { Grid } from "../Astalified/index";
 import DateTimeLabel from "../lib/datetime";
@@ -82,6 +82,19 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 					self.attach(notifActions, 1, 2, 1, 1);
 				}}
 			/>
+		</box>
+	);
+}
+
+export function notifCounter() {
+	const notifd = AstalNotifd.get_default();
+
+	const notifcount = bind(notifd, "notifications").as((n) => n.length.toString());
+
+	return (
+		<box visible={bind(notifd, "notifications").as((n) => n.length > 0)} spacing={5}>
+			<image iconName={"preferences-system-notifications-symbolic"} />
+			<label label={notifcount} />
 		</box>
 	);
 }

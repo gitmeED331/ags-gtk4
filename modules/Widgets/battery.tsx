@@ -16,8 +16,8 @@ const ChargeIndicatorIcon = ({ charging }: { charging: any }) => <image cssName=
 
 const TheLabelReveal = ({ battery, charging }: { battery: AstalBat.Device; charging: any }) => {
 	return (
-		<revealer visible transitionType={REVEAL_SLIDE_RIGHT} transitionDuration={TRANSITION} revealChild={bind(battery, "charging").as((c) => !c)}>
-			<label visible label={bind(battery, "percentage").as((p) => `${p * 100}%`)} tooltipText={chargeTooltip(charging)} onDestroy={(self) => self.unparent()} />
+		<revealer transitionType={REVEAL_SLIDE_RIGHT} transitionDuration={TRANSITION} revealChild={bind(battery, "charging").as((c) => !c)}>
+			<label label={bind(battery, "percentage").as((p) => `${p * 100}%`)} tooltipText={chargeTooltip(charging)} onDestroy={(self) => self.unparent()} />
 		</revealer>
 	);
 };
