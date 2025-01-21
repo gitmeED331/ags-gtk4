@@ -1,4 +1,4 @@
-import { Gdk, Widget, Gtk, App } from "astal/gtk4";
+import { Gdk, Widget, Gtk, App, hook } from "astal/gtk4";
 import { bind, Variable, timeout, Gio, GLib, AstalIO } from "astal";
 import AstalTray from "gi://AstalTray";
 

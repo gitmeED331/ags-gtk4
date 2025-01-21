@@ -9,6 +9,7 @@ import ListBoxRow from "./ListBoxRow";
 import RegularWindow from "./RegularWindow";
 // import SearchEntry from "./SearchEntry";
 import ScrolledWindow from "./Scrollable";
+import Separator from "./Separator";
 import Spinner from "./Spinner";
 import Stack from "./Stack";
 import StackSidebar from "./StackSideBar";
@@ -27,6 +28,7 @@ export {
 	RegularWindow,
 	// SearchEntry,
 	ScrolledWindow,
+	Separator,
 	Spinner,
 	Stack,
 	StackSidebar,

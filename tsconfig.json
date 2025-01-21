@@ -14,6 +14,8 @@
 		"alwaysStrict": true,
 		"noImplicitThis": true,
 		"baseUrl": ".",
+		"skipLibCheck": true,
+		"skipDefaultLibCheck": false,
 		"jsx": "react-jsx",
 		"jsxImportSource": "/usr/share/astal/gjs/gtk4",
 		"paths": {

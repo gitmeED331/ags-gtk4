@@ -1,3 +1,4 @@
+import { Gtk, Widget } from "astal/gtk4";
 import { bind, exec, execAsync, monitorFile, Variable } from "astal";
 import Icon from "../lib/icons";
 
@@ -16,11 +17,12 @@ function getValue() {
 		return isNaN(brightness) ? 0 : brightness;
 	} catch (error) {
 		console.error("Error fetching brightness:", error);
-		return 0;
+		return 50;
 	}
 }
 
 let currentBrightness = Variable(getValue());
+
 let currentIcon = getIconForBrightness(currentBrightness.get());
 
 export default function BrightnessSlider() {
@@ -38,7 +40,7 @@ export default function BrightnessSlider() {
 				const newIcon = getIconForBrightness(value);
 				if (currentIcon !== newIcon) {
 					currentIcon = newIcon;
-					theIcon.icon = newIcon;
+					theIcon.iconName = currentIcon;
 				}
 			}}
 		/>
@@ -54,10 +56,10 @@ export default function BrightnessSlider() {
 			currentBrightness = Variable(brightness);
 			currentIcon = getIconForBrightness(brightness);
 			slider.value = brightness;
-			theIcon.icon = currentIcon;
+			theIcon.iconName = currentIcon;
 		} else {
 			console.warn("Invalid brightness value:", brightness);
-			slider.value = 0;
+			slider.value = 50;
 		}
 	}
 
@@ -73,7 +75,7 @@ export default function BrightnessSlider() {
 		}
 	});
 
-	setTimeout(initializeValues, 0);
+	initializeValues();
 
 	return (
 		<box cssClasses={["brightness"]} halign={FILL} valign={FILL} vertical spacing={5}>

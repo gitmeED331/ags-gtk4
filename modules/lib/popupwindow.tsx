@@ -6,6 +6,7 @@ import { WindowProps, Revealer } from "astal/gtk4/widget";
 import { Fixed } from "../Astalified/index";
 import ScreenSizing from "../lib/screensizeadjust";
 
+
 type GlobalEventBoxes = {
 	[key: string]: unknown;
 };

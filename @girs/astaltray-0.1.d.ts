@@ -274,6 +274,11 @@ declare module 'gi://AstalTray?version=0.1' {
             // Methods
 
             /**
+             * tells the tray app that its menu is about to be opened, so it can update the menu if needed. You should call this method before openening the
+             * menu.
+             */
+            about_to_show(): void;
+            /**
              * Send an activate request to the tray app.
              * @param x
              * @param y
@@ -304,8 +309,8 @@ declare module 'gi://AstalTray?version=0.1' {
             get_icon_pixbuf(): GdkPixbuf.Pixbuf;
             get_gicon(): Gio.Icon;
             get_item_id(): string;
-            get_menu_model(): Gio.MenuModel;
-            get_action_group(): Gio.ActionGroup;
+            get_menu_model(): Gio.MenuModel | null;
+            get_action_group(): Gio.ActionGroup | null;
         }
 
         type TrayClass = typeof Tray;

@@ -56,27 +56,6 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 		);
 	}
 
-	const scrollController = new Gtk.EventControllerScroll();
-	scrollController.set_flags(Gtk.EventControllerScrollFlags.BOTH_AXES);
-
-	scrollController.connect("scroll", (_, dx, dy) => {
-		const step = 0.05;
-		const currentVolume = device.get_volume();
-
-		if (dy !== 0) {
-			// First ensure we have a non-zero value
-			if (dy < 0) {
-				device.set_volume(Math.min(currentVolume + step, 1.5));
-			} else {
-				device.set_volume(Math.max(currentVolume - step, 0.0));
-			}
-
-			if (device.get_mute() === true) {
-				device.set_mute(false);
-			}
-		}
-	});
-
 	return (
 		<button
 			cssClasses={bind(Bindings).as((c) => c.buttonCN)}
@@ -103,13 +82,22 @@ function Indicator({ device, type }: { device: AstalWp.Endpoint; type: "speaker"
 					}
 				}
 			}}
-			// onScroll={(_, dx: number, dy: number) => {
-			// 	const volumeChange = dy < 0 ? 0.05 : -0.05;
-			// 	device.set_volume(device.volume + volumeChange);
-			// 	device.set_mute(false);
-			// }}
-			setup={(self) => {
-				self.add_controller(scrollController);
+			onScroll={(_, dx: number, dy: number) => {
+				const step = 0.05;
+				const currentVolume = device.get_volume();
+
+				if (dy !== 0) {
+					// First ensure we have a non-zero value
+					if (dy < 0) {
+						device.set_volume(Math.min(currentVolume + step, 1.5));
+					} else {
+						device.set_volume(Math.max(currentVolume - step, 0.0));
+					}
+
+					if (device.get_mute() === true) {
+						device.set_mute(false);
+					}
+				}
 			}}
 		>
 			<image iconName={bind(Bindings).as((c) => c.theIcon)} />

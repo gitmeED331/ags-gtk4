@@ -69,10 +69,22 @@ function AudioElement({ element, type, ...props }: { element: AstalWp.Endpoint; 
 						element.set_mute(!element.get_mute());
 					}
 				}}
-				onScroll={(_, dy) => {
-					const volumeChange = dy < 0 ? 0.05 : -0.05;
-					element.set_volume(element.get_volume() + volumeChange);
-					element.set_mute(false);
+				onScroll={(_, dx: number, dy: number) => {
+					const step = 0.05;
+					const currentVolume = element.get_volume();
+
+					if (dy !== 0) {
+						// First ensure we have a non-zero value
+						if (dy < 0) {
+							element.set_volume(Math.min(currentVolume + step, 1.5));
+						} else {
+							element.set_volume(Math.max(currentVolume - step, 0.0));
+						}
+
+						if (element.get_mute() === true) {
+							element.set_mute(false);
+						}
+					}
 				}}
 				halign={START}
 				hasTooltip

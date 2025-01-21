@@ -1,20 +1,31 @@
 import { Astal, Gdk, Gtk, App, Widget } from "astal/gtk4";
-import { idle, timeout, Variable, bind } from "astal";
+import { idle, timeout, Variable, bind, GLib, AstalIO } from "astal";
 import AstalNotifd from "gi://AstalNotifd";
 import { NotifWidget } from "../Widgets/index";
-// import { type Subscribable } from "astal/binding";
+import { type Subscribable } from "astal/binding";
+import WifiAP from "modules/Widgets/Network/WifiAP";
 
 const WINDOWNAME = `notifications${App.get_monitors()[0].get_model()}`;
 
+interface NotificationItemProps {
+	notification: typeof AstalNotifd.Notification;
+	onRemove: () => void;
+}
+
+const DEFAULTS = {
+	EXPIRE_TIME: 20000,
+	WAIT_TIME: 1000,
+} as const;
+
 function NotifItem() {
 	const Notif = AstalNotifd.get_default();
-	const waitTime = new Variable(3000);
-	const expireTime = new Variable(20000);
+	const expireTime = new Variable(DEFAULTS.EXPIRE_TIME);
+	const waitTime = new Variable(DEFAULTS.WAIT_TIME);
 
 	function removeItem(box: Gtk.Box, notificationItem: any) {
+		expireTime.drop();
+		waitTime.drop();
 		notificationItem.unparent();
-		expireTime.set(0);
-		waitTime.set(0);
 
 		const win = App.get_window(WINDOWNAME);
 		if (win && !box.get_first_child()) {
@@ -45,21 +56,34 @@ function NotifItem() {
 							break;
 					}
 				}}
-				onHoverEnter={() => {
-					expireTime.set(0);
-					waitTime.set(0);
-					idle;
+				onHoverEnter={(self) => {
+					idle(expireTime);
 				}}
 				onHoverLeave={() => {
-					waitTime.set(3000);
-					timeout(waitTime.get(), () => removeItem(popupBox, notificationItem));
+					timeout(DEFAULTS.WAIT_TIME, () => removeItem(popupBox, notificationItem));
 				}}
 			/>
 		);
 
 		popupBox.append(notificationItem);
 
-		notification.connect("dismissed", () => removeItem(popupBox, notificationItem));
+		notification.connect("dismissed", () => {
+			if (!notification) return;
+			removeItem(popupBox, notificationItem);
+		});
+
+		let isHandlingResolved = false;
+
+		notification.connect("resolved", () => {
+			if (!notification || isHandlingResolved) return;
+
+			try {
+				isHandlingResolved = true;
+				notification.dismiss();
+			} finally {
+				isHandlingResolved = false;
+			}
+		});
 
 		if (expireTime.get() > waitTime.get()) {
 			setTimeout(() => {
@@ -67,6 +91,7 @@ function NotifItem() {
 			}, expireTime.get());
 		}
 	});
+
 	return popupBox;
 }
 
@@ -100,17 +125,57 @@ export default (monitor: Gdk.Monitor) => {
 
 // const TIMEOUT_DELAY = 5000;
 
-// class NotifiationMap implements Subscribable {
-// 	private map: Map<number, Gtk.Widget> = new Map();
+// export class VarMap<K, T = Gtk.Widget> implements Subscribable {
+// 	#subs = new Set<(v: Array<[K, T]>) => void>();
+// 	#map: Map<K, T>;
 
-// 	private var: Variable<Array<Gtk.Widget>> = Variable([]);
-
-// 	private notifiy() {
-// 		this.var.set([...this.map.values()].reverse());
+// 	constructor(initial?: Iterable<[K, T]>) {
+// 		this.#map = new Map(initial);
 // 	}
 
+// 	get(): [K, T][] {
+// 		return [...this.#map.entries()];
+// 	}
+
+// 	set(key: K, value: T): void {
+// 		this.#delete(key);
+// 		this.#map.set(key, value);
+// 		this.#notify();
+// 	}
+
+// 	#delete(key: K): void {
+// 		const v = this.#map.get(key);
+
+// 		if (v instanceof Gtk.Widget) {
+// 			v.unparent();
+// 		}
+
+// 		this.#map.delete(key);
+// 	}
+
+// 	delete(key: K): void {
+// 		this.#delete(key);
+// 		this.#notify();
+// 	}
+
+// 	subscribe(callback: (v: Array<[K, T]>) => void): () => boolean {
+// 		this.#subs.add(callback);
+// 		return () => this.#subs.delete(callback);
+// 	}
+
+// 	#notify(): void {
+// 		const value = this.get();
+// 		for (const sub of this.#subs) {
+// 			sub(value);
+// 		}
+// 	}
+// }
+
+// class NotificationMap extends VarMap<number, Gtk.Widget> {
+// 	#notifd = AstalNotifd.get_default();
+
 // 	constructor() {
-// 		const notifd = AstalNotifd.get_default();
+// 		super();
 
 // 		/**
 // 		 * uncomment this if you want to
@@ -118,69 +183,74 @@ export default (monitor: Gdk.Monitor) => {
 // 		 * note that if the notification has any actions
 // 		 * they might not work, since the sender already treats them as resolved
 // 		 */
-// 		// notifd.ignoreTimeout = true
+// 		// Ignore timeouts set by notification senders so we can enforce our own
+// 		this.#notifd.ignoreTimeout = true;
 
-// 		notifd.connect("notified", (_, id) => {
+// 		this.#notifd.connect("notified", (_, id) => {
 // 			this.set(
 // 				id,
 // 				NotifWidget({
-// 					n: notifd.get_notification(id)!,
+// 					n: this.#notifd.get_notification(id),
 // 					onButtonPressed: (_, event) => {
 // 						switch (event.get_button()) {
 // 							case Gdk.BUTTON_PRIMARY:
 // 								this.delete(id);
 // 								break;
 // 							case Gdk.BUTTON_SECONDARY:
-// 								notifd.get_notification(id).dismiss();
+// 								// this.#notifd.get_notification(id).dismiss();
 // 								break;
 // 						}
 // 					},
 
+// 					// Remove the notification after the timeout has passed.
+// 					setup: () => timeout(TIMEOUT_DELAY, () => this.delete(id)),
 // 					onHoverLeave: () => this.delete(id),
-
-// 					setup: () =>
-// 						timeout(TIMEOUT_DELAY, () => {
-// 							this.delete(id);
-// 						}),
+// 					onHoverEnter: () => idle,
 // 				}),
 // 			);
 // 		});
 
-// 		notifd.connect("resolved", (_, id) => {
+// 		// notifications can be closed by the outside before
+// 		// any user input, which have to be handled too
+// 		this.#notifd.connect("resolved", (_, id) => {
 // 			this.delete(id);
 // 		});
 // 	}
 
-// 	private set(key: number, value: Gtk.Widget) {
-// 		this.map.get(key)?.unparent();
-// 		this.map.set(key, value);
-// 		this.notifiy();
+// 	override set(key: number, value: Gtk.Widget): void {
+// 		super.set(key, value);
+
+// 		// If a notification was added, ensure the window is visible.
+// 		const window = App.get_window("notifications") ?? undefined;
+// 		if (window !== undefined && !window.visible) {
+// 			window.show();
+// 		}
 // 	}
 
-// 	private delete(key: number) {
-// 		this.map.get(key)?.unparent();
-// 		this.map.delete(key);
-// 		this.notifiy();
-// 	}
+// 	override delete(id: number): void {
+// 		super.delete(id);
 
-// 	get() {
-// 		return this.var.get();
-// 	}
-
-// 	subscribe(callback: (list: Array<Gtk.Widget>) => void) {
-// 		return this.var.subscribe(callback);
+// 		// If all notifications have been removed, hide the window.
+// 		const window = App.get_window("notifications") ?? undefined;
+// 		if (window !== undefined && this.get().length < 1) {
+// 			window.hide();
+// 		}
 // 	}
 // }
 
-// export default function (gdkmonitor: Gdk.Monitor) {
-// 	const { TOP, RIGHT } = Astal.WindowAnchor;
-// 	const notifs = new NotifiationMap();
+// export default function () {
+// 	const notifications = new NotificationMap();
 
 // 	return (
-// 		<window name={WINDOWNAME} cssClasses={["notifications", "notif", "window"]} gdkmonitor={gdkmonitor} exclusivity={Astal.Exclusivity.EXCLUSIVE} anchor={TOP | RIGHT}>
-// 			<box vertical noImplicitDestroy>
-// 				{bind(notifs)}
-// 			</box>
+// 		<window
+// 			// `name` must go before `application`.
+// 			name="notifications"
+// 			application={App}
+// 			cssClasses={["notifications"]}
+// 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
+// 			anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
+// 		>
+// 			<box vertical>{bind(notifications)}</box>
 // 		</window>
 // 	);
 // }

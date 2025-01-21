@@ -1,6 +1,13 @@
 import { Gtk } from "astal/gtk4";
 import { bind, Variable } from "astal";
 import { cpuUsage, memoryAvailable, memoryTotal, memoryUsage } from "./StatsCalc";
+// import GTop from "../../../node_modules/gtop/package.json"
+
+// const UsedRam = new Variable<number>(0).poll(1000, () => {
+//     GTop.glibtop_get_mem(mem);
+// console.log(mem);
+//     return (mem.used - mem.cached) / (1024 * 1024 * 1024);
+// })
 
 function systemStats() {
 	const memoryTooltip = Variable.derive([memoryAvailable, memoryTotal], (available, total) => `${((total - available) / 1024 / 1024).toFixed(1)} GiB used`);

@@ -8,7 +8,7 @@
 .barwindow {
 	all: unset;
 }
-.bar {
+window.bar {
 	color: $color7;
 	background: none;
 
@@ -82,9 +82,9 @@
 			animation: spin 1s linear infinite;
 		}
 	}
-	&-icon {
+	/* &-icon {
 		margin: 0rem 1rem;
-	}
+	} */
 }
 
 /* --- sysinfo --- */

@@ -1,35 +1,125 @@
 @use "../_variables" as *;
 
 .tray {
-	/* background: $TertiaryBG; */
-	border: $border;
-	border-radius: $radius;
-	padding: 0.25rem;
-
-	> * {
-		border: 2px solid transparent;
-		background-color: transparent;
-		font-weight: bold;
+	* {
+		all: unset;
+		color: $color1;
+	}
+	&.container {
+		border: $border;
+		border-radius: $radius;
+		padding: 0.25rem;
+	}
+	> * > arrow {
+		/* all: unset; */
+		background: $SecondaryBG;
+		border: $border;
 	}
 
-	button {
+	.trayitem {
+		border: 2px solid transparent;
+		border-radius: $radius;
+		padding: 0.25rem;
+		&:hover {
+			background-color: #1e1e2e;
+			border-radius: $radius;
+			border: $border;
+			image {
+				color: $color5;
+			}
+		}
 		image {
 			color: $color1;
 			border-radius: $radius;
 		}
+	}
+	.menu {
+		contents {
+			border: $border;
+			border-radius: $radius;
 
+			> * > * {
+				padding: 0.75rem;
+				/* background-color: transparent; */
+				font-weight: bold;
+				border-radius: $radius;
+				background: $SecondaryBG;
+			}
+
+			.flat {
+				border-radius: $radius;
+				padding: 0.25rem;
+
+				&:hover {
+					color: $color5;
+					font-weight: bold;
+					border: $border;
+					border-top: none;
+					border-color: $color4;
+
+					image {
+						color: $color4;
+					}
+				}
+				image {
+					color: $color1;
+				}
+
+				&:disabled {
+					color: gray;
+					background: rgba(39, 38, 38, 0.5);
+					border: none;
+				}
+			}
+		}
+	}
+}
+
+/* .tray {
+	all: unset;
+	background: $TertiaryBG;
+	border: $border;
+	border-radius: $radius;
+	padding: 0.25rem;
+	* > arrow {
+		background: $SecondaryBG;
+		border: $border;
+	}
+	> * {
+	}
+	contents {
+		border: 2px solid transparent;
+		padding: 0rem;
+		> * {
+			background-color: transparent;
+			font-weight: bold;
+			padding: 0.75rem;
+			border: $border;
+			border-radius: $radius;
+			background: $SecondaryBG;
+		}
+		> * > * {
+			border-radius: $radius;
+			background: $SecondaryBG;
+		}
+	}
+	button {
 		&:hover {
 			background-color: #1e1e2e;
 			border-radius: $radius;
 			border: $border;
 		}
+		image {
+			color: $color1;
+			border-radius: $radius;
+		}
 	}
-}
+} */
 
-.menu {
+/* .menu {
 	all: unset;
 	arrow {
-		/* all: unset; */
+		all: unset;
 		left,
 		right {
 			background: red;
@@ -42,16 +132,16 @@
 		}
 	}
 	contents {
-		/* background: rgba(0, 0, 0, 1);
+		background: rgba(0, 0, 0, 1);
 		border-radius: $radius;
 		border: $border;
 		padding: 0.25rem;
-		color: $color1; */
+		color: $color1;
 		.inline-buttons button.model {
 			color: blue;
 		}
 		.flat {
-			/* background: rgba(0, 0, 0, 1); */
+			 background: rgba(0, 0, 0, 1);
 			border-radius: $radius;
 			color: $color1;
 			margin: 0.5rem;
@@ -79,4 +169,4 @@
 			}
 		}
 	}
-}
+} */

@@ -3,19 +3,12 @@ import { Grid } from "../../Astalified/index";
 import PopupWindow from "../../lib/popupwindow";
 
 // --- imported widgets ---
-import { Tray } from "../../Widgets/index";
-import playerStack, { dashboardPlayerStack } from "../../Widgets/MediaPlayer";
+import { Tray, SystemTray } from "../../Widgets/index";
+import PlayerStack from "../../Widgets/MediaPlayer";
 import LeftSide from "./LeftSide";
 import RightSide from "./RightSide";
 
 export default function Dashboard() {
-	const playerStackStyles = App.apply_css(`
-    .playerstack {
-        border: 2px solid rgb(15, 155, 255);
-        border-radius: 3rem;
-    }
-`);
-
 	return (
 		<Grid
 			cssClasses={["dashboard", "grid"]}
@@ -29,9 +22,8 @@ export default function Dashboard() {
 			rowHomogeneous={false}
 			columnHomogeneous={false}
 			setup={(self) => {
-				self.attach(Tray(), 0, 0, 2, 1);
-				self.attach(playerStack({ cssName: "dashplayer" }), 0, 1, 2, 1);
-
+				self.attach(<SystemTray />, 0, 0, 2, 1);
+				self.attach(<PlayerStack custCSS={["dashplayer"]} />, 0, 1, 2, 1);
 				self.attach(LeftSide(), 0, 2, 1, 1);
 				self.attach(RightSide(), 1, 2, 1, 1);
 			}}

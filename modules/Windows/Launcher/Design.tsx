@@ -118,10 +118,17 @@ const uniqueCategories = Array.from(new Set(Applications.flatMap((app) => getCat
 
 const allAppsPage = (
 	<box name="All Apps" halign={FILL} valign={FILL}>
-		{bind(Apps, "list").as((l) => createScrollablePage(l))}
+		{bind(Apps, "list").as((l) =>
+			createScrollablePage(
+				l.sort((A, B) => {
+					const compA = A.get_name().toLowerCase();
+					const compB = B.get_name().toLowerCase();
+					return compA.localeCompare(compB);
+				}),
+			),
+		)}
 	</box>
 );
-
 const categoryPages = uniqueCategories.map((category) => {
 	const sortedAppsInCategory = Applications.filter((app) => getCategories(app).includes(category)).sort((a, b) => a.get_name().localeCompare(b.get_name()));
 

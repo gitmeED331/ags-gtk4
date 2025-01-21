@@ -1262,6 +1262,10 @@ declare module 'gi://Wnck?version=3.0' {
             }
         }
 
+        /**
+         * The #WnckHandle struct contains only private fields and should not be
+         * directly accessed.
+         */
         class Handle extends GObject.Object {
             static $gtype: GObject.GType<Handle>;
 

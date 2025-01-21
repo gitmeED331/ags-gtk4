@@ -1,19 +1,26 @@
-@use '../_variables' as *;
+@use "../_variables" as *;
 
 tooltip {
 	* {
 		all: unset;
 		background-color: transparent;
 		border: none;
+		border-radius: $radius;
 	}
 
-	>*>* {
+	> * > * {
 		background: black;
-		border-radius: $radius;
 		border: calc($border-width / 10) solid $popover-border-color;
 		color: $color1;
 		padding: 0.75rem;
-		margin: 4px;
+		margin: 0.25rem;
 		box-shadow: 0 0 5px 0 $shadow-color;
+	}
+	.tooltipplayer {
+		border: $border;
+		padding: 0.5rem 0 0 8rem;
+		box-shadow: 0 0 5px 0 $shadow-color;
+		min-width: 275px;
+		min-height: 100px;
 	}
 }

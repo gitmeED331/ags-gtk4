@@ -1326,19 +1326,33 @@ declare module 'gi://Xdp?version=1.0' {
              *
              * - title `s`: a user-visible string to display as title
              * - body `s`: a user-visible string to display as body
-             * - icon `v`: a serialized icon (in the format produced by [method`Gio`.Icon.serialize])
+             * - markup-body `s`: a user-visible string to display as body with support for markup
+             * - icon `v`: a serialized icon (in the format produced by [method`Gio`.Icon.serialize]
+             *   for class`Gio`.ThemedIcon, class`Gio`.FileIcon and class`Gio`.BytesIcon)
+             * - sound `v`: a serialized sound
              * - priority `s`: "low", "normal", "high" or "urgent"
              * - default-action `s`: name of an action that
              *     will be activated when the user clicks on the notification
              * - default-action-target `v`: target parameter to send along when
              *     activating the default action.
              * - buttons `aa{sv}`: array of serialized buttons
+             * - display-hint `as`: An array of display hints.
+             * - category `s`: A category for this notification. [See the spec for supported categories](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Notification.html#org-freedesktop-portal-notification-addnotification)
+             *
+             * The serialized sound consists of a `s` or `sv`:
+             * - default : Play the default sound for the notification.
+             * - silent : Don't ever play a sound for the notification.
+             * - file `s`: A path to a sound file.
+             * - bytes `ay`: An array of bytes.
+             *
+             * The supported sound formats are ogg/opus, ogg/vorbis and wav/pcm.
              *
              * Each serialized button is a dictionary with the following supported keys:
              *
-             * - label `s`: user-visible lable for the button. Mandatory
+             * - label `s`: user-visible label for the button. Mandatory without a purpose.
              * - action `s`: name of an action that will be activated when
              *     the user clicks on the button. Mandatory
+             * - purpose `s`: information used by the server to style the button specially.
              * - target `v`: target parameter to send along when activating
              *     the button
              *
@@ -1369,19 +1383,33 @@ declare module 'gi://Xdp?version=1.0' {
              *
              * - title `s`: a user-visible string to display as title
              * - body `s`: a user-visible string to display as body
-             * - icon `v`: a serialized icon (in the format produced by [method`Gio`.Icon.serialize])
+             * - markup-body `s`: a user-visible string to display as body with support for markup
+             * - icon `v`: a serialized icon (in the format produced by [method`Gio`.Icon.serialize]
+             *   for class`Gio`.ThemedIcon, class`Gio`.FileIcon and class`Gio`.BytesIcon)
+             * - sound `v`: a serialized sound
              * - priority `s`: "low", "normal", "high" or "urgent"
              * - default-action `s`: name of an action that
              *     will be activated when the user clicks on the notification
              * - default-action-target `v`: target parameter to send along when
              *     activating the default action.
              * - buttons `aa{sv}`: array of serialized buttons
+             * - display-hint `as`: An array of display hints.
+             * - category `s`: A category for this notification. [See the spec for supported categories](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Notification.html#org-freedesktop-portal-notification-addnotification)
+             *
+             * The serialized sound consists of a `s` or `sv`:
+             * - default : Play the default sound for the notification.
+             * - silent : Don't ever play a sound for the notification.
+             * - file `s`: A path to a sound file.
+             * - bytes `ay`: An array of bytes.
+             *
+             * The supported sound formats are ogg/opus, ogg/vorbis and wav/pcm.
              *
              * Each serialized button is a dictionary with the following supported keys:
              *
-             * - label `s`: user-visible lable for the button. Mandatory
+             * - label `s`: user-visible label for the button. Mandatory without a purpose.
              * - action `s`: name of an action that will be activated when
              *     the user clicks on the button. Mandatory
+             * - purpose `s`: information used by the server to style the button specially.
              * - target `v`: target parameter to send along when activating
              *     the button
              *
@@ -1414,19 +1442,33 @@ declare module 'gi://Xdp?version=1.0' {
              *
              * - title `s`: a user-visible string to display as title
              * - body `s`: a user-visible string to display as body
-             * - icon `v`: a serialized icon (in the format produced by [method`Gio`.Icon.serialize])
+             * - markup-body `s`: a user-visible string to display as body with support for markup
+             * - icon `v`: a serialized icon (in the format produced by [method`Gio`.Icon.serialize]
+             *   for class`Gio`.ThemedIcon, class`Gio`.FileIcon and class`Gio`.BytesIcon)
+             * - sound `v`: a serialized sound
              * - priority `s`: "low", "normal", "high" or "urgent"
              * - default-action `s`: name of an action that
              *     will be activated when the user clicks on the notification
              * - default-action-target `v`: target parameter to send along when
              *     activating the default action.
              * - buttons `aa{sv}`: array of serialized buttons
+             * - display-hint `as`: An array of display hints.
+             * - category `s`: A category for this notification. [See the spec for supported categories](https://flatpak.github.io/xdg-desktop-portal/docs/doc-org.freedesktop.portal.Notification.html#org-freedesktop-portal-notification-addnotification)
+             *
+             * The serialized sound consists of a `s` or `sv`:
+             * - default : Play the default sound for the notification.
+             * - silent : Don't ever play a sound for the notification.
+             * - file `s`: A path to a sound file.
+             * - bytes `ay`: An array of bytes.
+             *
+             * The supported sound formats are ogg/opus, ogg/vorbis and wav/pcm.
              *
              * Each serialized button is a dictionary with the following supported keys:
              *
-             * - label `s`: user-visible lable for the button. Mandatory
+             * - label `s`: user-visible label for the button. Mandatory without a purpose.
              * - action `s`: name of an action that will be activated when
              *     the user clicks on the button. Mandatory
+             * - purpose `s`: information used by the server to style the button specially.
              * - target `v`: target parameter to send along when activating
              *     the button
              *
@@ -1926,6 +1968,7 @@ declare module 'gi://Xdp?version=1.0' {
              * @returns a [class@Settings] new settings object.
              */
             get_settings(): Settings;
+            get_supported_notification_options(): GLib.Variant;
             /**
              * Gets information about the user.
              *
@@ -3142,7 +3185,7 @@ declare module 'gi://Xdp?version=1.0' {
                 sandbox_expose?: string[] | null,
                 sandbox_expose_ro?: string[] | null,
                 cancellable?: Gio.Cancellable | null,
-            ): Promise<number>;
+            ): Promise<never>;
             /**
              * Creates a new copy of the applications sandbox, and runs
              * a process in, with the given arguments.
@@ -3200,7 +3243,7 @@ declare module 'gi://Xdp?version=1.0' {
                 sandbox_expose_ro?: string[] | null,
                 cancellable?: Gio.Cancellable | null,
                 callback?: Gio.AsyncReadyCallback<this> | null,
-            ): Promise<number> | void;
+            ): Promise<never> | void;
             /**
              * Finishes the spawn request.
              *
@@ -3208,7 +3251,7 @@ declare module 'gi://Xdp?version=1.0' {
              * @param result a [iface@Gio.AsyncResult]
              * @returns the pid of the spawned process.
              */
-            spawn_finish(result: Gio.AsyncResult): number;
+            spawn_finish(result: Gio.AsyncResult): never;
             /**
              * Sends a Unix signal to a process that has been spawned
              * by [method`Portal`.spawn].
@@ -3216,7 +3259,7 @@ declare module 'gi://Xdp?version=1.0' {
              * @param signal the Unix signal to send (see signal(7))
              * @param to_process_group whether to send the signal to the process     group of the process
              */
-            spawn_signal(pid: number, signal: number, to_process_group: boolean): void;
+            spawn_signal(pid: never, signal: number, to_process_group: boolean): void;
             /**
              * Takes a screenshot.
              *

@@ -1,4 +1,4 @@
-import { Gdk, Gtk, Widget } from "astal/gtk4";
+import { App, Gdk, Gtk, Widget } from "astal/gtk4";
 import { GLib, bind } from "astal";
 import Icon from "../lib/icons";
 import { Grid } from "../Astalified/index";
@@ -86,13 +86,13 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 	);
 }
 
-export function notifCounter() {
+export function notifCounter({ ...props }: Widget.BoxProps) {
 	const notifd = AstalNotifd.get_default();
 
 	const notifcount = bind(notifd, "notifications").as((n) => n.length.toString());
 
 	return (
-		<box visible={bind(notifd, "notifications").as((n) => n.length > 0)} spacing={5}>
+		<box spacing={5} halign={CENTER} {...props}>
 			<image iconName={"preferences-system-notifications-symbolic"} />
 			<label label={notifcount} />
 		</box>

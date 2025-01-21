@@ -1662,7 +1662,7 @@ declare module 'gi://Poppler?version=0.18' {
             /**
              * Returns the border width of the annotation. Some PDF editors set a border
              * width even if the border is not actually drawn.
-             * @param width
+             * @param width a valid pointer to a double
              * @returns true and sets @border_width to the actual border width if a border is defined, otherwise returns false and sets @border_width to 0.
              */
             get_border_width(width: number): boolean;
@@ -1709,7 +1709,7 @@ declare module 'gi://Poppler?version=0.18' {
              * mechanism in the GLib binding to control the appearance of the border width,
              * this should generally only be used to disable the border, although the
              * API might be completed in the future.
-             * @param width
+             * @param width the new border width
              */
             set_border_width(width: number): void;
             /**
@@ -3611,7 +3611,7 @@ declare module 'gi://Poppler?version=0.18' {
              * Retrieves the contents of the specified `selection` as text.
              * @param style a #PopplerSelectionStyle
              * @param selection the #PopplerRectangle including the text
-             * @returns a pointer to the contents of the @selection               as a string
+             * @returns a pointer to the contents of the @selection as a string
              */
             get_selected_text(style: SelectionStyle | null, selection: Rectangle): string;
             /**

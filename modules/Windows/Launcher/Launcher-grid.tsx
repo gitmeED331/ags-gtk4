@@ -7,7 +7,6 @@ import entry, { query } from "./search";
 import { theStack, Switcher } from "./Design";
 import { Applications } from "./AppAccess";
 import SessionControls, { SysBtn } from "../../Widgets/SessionControls";
-import PopupWindow from "../../lib/popupwindow";
 import ScreenSizing from "../../lib/screensizeadjust";
 
 const background = `${SRC}/assets/groot-thin-right.png`;

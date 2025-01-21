@@ -7,12 +7,13 @@ import EthernetWidget from "./Network/Ethernet";
 // import GridCalendar from "./GridCalendar";
 import NetworkButton from "./Network/BarButton";
 import NotifWidget from "./Notification";
-import playerStack from "./MediaPlayer";
+import PlayerStack from "./MediaPlayer";
 import PowerProfiles from "./powerprofiles";
 import PrivacyModule from "./PrivacyIndicator";
 import SessionControls from "./SessionControls";
 import SRIndicate from "./screenshot";
 import Tray from "./Tray";
+import SystemTray from "./tray2";
 import VolumeIndicator from "./VolumeIndicator";
 import Wifi from "./Network/WiFi";
 
@@ -23,7 +24,7 @@ export {
 	// GridCalendar,
 	VolumeIndicator,
 	BatteryButton,
-	playerStack,
+	PlayerStack,
 	PowerProfiles,
 	NetworkButton,
 	EthernetWidget,
@@ -33,5 +34,6 @@ export {
 	PrivacyModule,
 	SessionControls,
 	SRIndicate,
+	SystemTray,
 	Tray,
 };

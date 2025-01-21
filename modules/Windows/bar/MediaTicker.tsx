@@ -6,7 +6,7 @@ import Pango from "gi://Pango";
 import TrimTrackTitle from "../../lib/TrimTrackTitle";
 import Icon from "../../lib/icons";
 import { Stack } from "../../Astalified/index";
-import playerStack from "../../Widgets/MediaPlayer";
+import PlayerStack from "../../Widgets/MediaPlayer";
 
 const SWITCH_INTERVAL = 5000; // 5 seconds between switches
 
@@ -20,7 +20,7 @@ export const popped = (
 		}}
 		hasArrow
 	>
-		{playerStack({ cssName: "popupplayer" })}
+		<PlayerStack custCSS={["popupplayer"]} />
 	</popover>
 ) as Gtk.Popover;
 
@@ -33,7 +33,7 @@ function tickerButton(player: Mpris.Player) {
 			}[info],
 			classname: ["ticker", info],
 			mwc: {
-				tracks: 50,
+				tracks: 30,
 				artists: 35,
 			}[info],
 		}))();
@@ -52,22 +52,6 @@ function tickerButton(player: Mpris.Player) {
 				onDestroy={(self) => {
 					self.unparent();
 				}}
-				// setup={() => {
-				// 	const fontCss = async (cover_art: string) => {
-				// 		const fontcssgen = (color: string): string => `text-shadow: ${color} 2px 1px;`;
-
-				// 		if (cover_art) {
-				// 			const color = await execAsync(`bash -c "convert ${cover_art} -alpha off -crop 5%x100%0+0+0 -colors 1 -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
-				// 			return fontcssgen(color);
-				// 		}
-				// 		return "color: rgba(255,255,255,1);";
-				// 	};
-				// 	const coverArtPath = player.cover_art || "";
-				// 	fontCss(coverArtPath).then((col) => {
-				// 		App.apply_css(`.artists { ${col} }`);
-				// 		App.apply_css(`.tracks { ${col} }`);
-				// 	});
-				// }}
 				{...props}
 			/>
 		);
@@ -76,7 +60,7 @@ function tickerButton(player: Mpris.Player) {
 	function theTooltip() {
 		return (
 			<box
-				cssClasses={["player"]}
+				cssClasses={["tooltipplayer"]}
 				vertical
 				spacing={10}
 				setup={() => {
@@ -98,24 +82,10 @@ function tickerButton(player: Mpris.Player) {
 					const coverArtPath = player.cover_art || "";
 
 					CoverArtCss(coverArtPath).then((css) => {
-						App.apply_css(`.player { ${css} }`, false);
+						App.apply_css(`.tooltipplayer { ${css} }`);
 					});
-					// 	const fontCss = async (cover_art: string) => {
-					// 		const fontcssgen = (color: string): string => `text-shadow: ${color} 2px 1px;`;
-
-					// 		if (cover_art) {
-					// 			const color = await execAsync(`bash -c "convert ${cover_art} -alpha off -crop 5%x100%0+0+0 -colors 1 -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
-					// 			return fontcssgen(color);
-					// 		}
-					// 		return "color: rgba(255,255,255,1);";
-					// 	};
-
-					// 	fontCss(coverArtPath).then((col) => {
-					// 		App.apply_css(`.artists { ${col} }`, false);
-					// 		App.apply_css(`.tracks { ${col} }`, false);
-					// 	});
 				}}
-				widthRequest={250}
+				widthRequest={400}
 				valign={CENTER}
 			>
 				<CustomLabel info="tracks" />
@@ -124,20 +94,6 @@ function tickerButton(player: Mpris.Player) {
 			</box>
 		);
 	}
-
-	const scrollController = new Gtk.EventControllerScroll();
-	scrollController.set_flags(Gtk.EventControllerScrollFlags.BOTH_AXES);
-
-	scrollController.connect("scroll", (_, dx, dy) => {
-		if (dy !== 0) {
-			// First ensure we have a non-zero value
-			if (dy < 0) {
-				player.previous();
-			} else {
-				player.next();
-			}
-		}
-	});
 
 	return (
 		<button
@@ -159,13 +115,22 @@ function tickerButton(player: Mpris.Player) {
 				// if (event.button === Gdk.BUTTON_MIDDLE) {
 				// }
 			}}
+			onScroll={(_, dx, dy) => {
+				if (dy !== 0) {
+					// First ensure we have a non-zero value
+					if (dy < 0) {
+						player.previous();
+					} else {
+						player.next();
+					}
+				}
+			}}
 			hasTooltip
 			onQueryTooltip={(self, x, y, kbtt, tooltip) => {
 				tooltip.set_custom(theTooltip());
 				return true;
 			}}
 			setup={(self) => {
-				self.add_controller(scrollController);
 				popped.set_parent(self);
 			}}
 		>
@@ -270,9 +235,5 @@ export default function MediaTickerButton() {
 		/>
 	);
 
-	return (
-		// <box cssClasses={["ticker", "container"]} halign={CENTER} valign={CENTER} vertical>
-		theStack
-		// </box>
-	);
+	return theStack;
 }

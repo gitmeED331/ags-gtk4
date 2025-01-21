@@ -16,11 +16,6 @@
 		color: $color1;
 	}
 
-	tooltip {
-		font-weight: bold;
-		padding: 10px;
-	}
-
 	button {
 		&:hover {
 			.tracks {
@@ -50,12 +45,6 @@
 	&.icon {
 		color: red;
 	}
-}
-
-.tickerbox {
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
 }
 
 // ---- Player ----

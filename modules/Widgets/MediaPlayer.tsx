@@ -5,15 +5,6 @@ import { Grid, StackSwitcher, Stack } from "../Astalified/index";
 import Icon from "../lib/icons";
 import TrimTrackTitle from "../lib/TrimTrackTitle";
 import Pango from "gi://Pango";
-import AstalApps from "gi://AstalApps";
-import { popped } from "../Windows/bar/MediaTicker";
-
-interface AstalApplication {
-	get_icon_name: () => string;
-	get_name: () => string;
-	get_description: () => string;
-	launch: () => void;
-}
 
 /** @param {import('types/service/mpris').MprisPlayer} player */
 function Player(player: Mpris.Player) {
@@ -35,8 +26,9 @@ function Player(player: Mpris.Player) {
 			}[info],
 		}))();
 
-		// return <box cssClasses={"trackinfo"} valign={CENTER} halign={CENTER} hexpand={true} vertical={true} spacing={5}>
 		return (
+			// <box cssClasses={"trackinfo"} valign={CENTER} halign={CENTER} hexpand={true} vertical={true} spacing={5}>
+
 			<label
 				cssClasses={[Bindings.as((b) => b.classname).get()]}
 				wrap={false}
@@ -45,6 +37,61 @@ function Player(player: Mpris.Player) {
 				ellipsize={Pango.EllipsizeMode.END}
 				maxWidthChars={Bindings.as((b) => b.maxwidthchars)}
 				label={Bindings.as((b) => b.label)}
+				setup={() => {
+					const generateAccentCss = (color: string): string => {
+						if (!color || !color.trim()) {
+							return "color: #ffffff;";
+						}
+						return `color: ${color};`; // The semicolon will be added when the CSS is applied
+					};
+
+					const extractColor = async (cover_art: string, colors: number): Promise<string> => {
+						return await execAsync(`bash -c "magick ${cover_art} -colors ${colors} -quantize RGB -unique-colors txt:- | awk '{ print $3 }' | tail -n 1"`);
+					};
+
+					const trackCss = async (cover_art: string): Promise<string> => {
+						if (cover_art) {
+							const color = await extractColor(cover_art, 3);
+							return generateAccentCss(color);
+						}
+						return "color: #ffffff;";
+					};
+
+					const artistCss = async (cover_art: string): Promise<string> => {
+						if (cover_art) {
+							const color = await extractColor(cover_art, 4);
+							return generateAccentCss(color);
+						}
+						return "color: #ffffff;";
+					};
+
+					const updateColors = () => {
+						const coverArt = player.cover_art || "";
+
+						if (!coverArt) {
+							App.apply_css(`.player .tracktitle { color: #ffffff; }`);
+							App.apply_css(`.player .artist { color: #ffffff; }`);
+							return;
+						}
+
+						trackCss(coverArt).then((col) => {
+							if (col && col.trim()) {
+								App.apply_css(`.player .tracktitle { ${col} }`, false); // Added semicolon
+							}
+						});
+						artistCss(coverArt).then((col) => {
+							if (col && col.trim()) {
+								App.apply_css(`.player .artist { ${col} }`, false); // Added semicolon
+							}
+						});
+					};
+
+					updateColors();
+
+					player.connect("notify::cover-art", () => {
+						updateColors();
+					});
+				}}
 			/>
 		);
 		// </box>
@@ -180,12 +227,12 @@ function Player(player: Mpris.Player) {
 					const command = Bindings.get().command;
 					if (command) command();
 				}}
-				// onDestroy={(self) => {
-				// 	self.unparent();
-				// }}
 				{...props}
+				onDestroy={(self) => {
+					self.unparent;
+				}}
 			>
-				<image iconName={bind(Bindings).as((b) => b.icon)} />
+				<image iconName={bind(Bindings).as((b) => b.icon)} onDestroy={(self) => self.unparent} />
 			</button>
 		);
 	};
@@ -238,24 +285,28 @@ function Player(player: Mpris.Player) {
 				self.unparent();
 			}}
 			setup={() => {
-				const CoverArtCss = async (cover_art: string): Promise<string> => {
-					const BGgen = (bg: string, color: string): string =>
-						`background-image: radial-gradient(circle at left, rgba(0, 0, 0, 0), ${color} 12rem), url('file://${bg}');` +
-						`background-position: left top, left top;` +
-						`background-size: contain;` +
-						`transition: all 0.7s ease;` +
-						`background-repeat: no-repeat;`;
+				const generateBackgroundCss = (bg: string, color: string): string =>
+					`background-image: radial-gradient(circle at left, rgba(0, 0, 0, 0), ${color} 12rem), url('file://${bg}');` +
+					`background-position: left top, left top;` +
+					`background-size: contain;` +
+					`transition: all 0.7s ease;` +
+					`background-repeat: no-repeat;`;
 
+				const extractColor = async (cover_art: string, colors: number): Promise<string> => {
+					return await execAsync(`bash -c "magick ${cover_art} -alpha off -crop 5%x100%0+0+0 -colors ${colors} -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
+				};
+
+				const CoverArtCss = async (cover_art: string): Promise<string> => {
 					if (cover_art) {
-						const color = await execAsync(`bash -c "convert ${cover_art} -alpha off -crop 5%x100%0+0+0 -colors 1 -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
-						return BGgen(cover_art, color);
+						const color = await extractColor(cover_art, 1);
+						return generateBackgroundCss(cover_art, color);
 					}
 					return "background-color: #0e0e1e;";
 				};
 
-				const coverArtPath = player.cover_art || "";
+				const coverArt = player.cover_art || "";
 
-				CoverArtCss(coverArtPath).then((css) => {
+				CoverArtCss(coverArt).then((css) => {
 					App.apply_css(`.player { ${css} }`, false);
 				});
 			}}
@@ -269,18 +320,19 @@ function Player(player: Mpris.Player) {
 export let dashboardPlayerStack: Gtk.Stack;
 export let windowPlayerStack: Gtk.Stack;
 
-export default function playerStack({ cssName }: { cssName: string }) {
+export default function playerStack({ custCSS, ...props }: { custCSS: string[] } & Widget.StackProps) {
 	const mpris = Mpris.get_default();
 
 	const theStack = (
 		<stack
-			cssClasses={[cssName]}
+			cssClasses={custCSS}
 			visible={true}
 			transitionType={Gtk.StackTransitionType.SLIDE_LEFT_RIGHT}
 			transition_duration={2000}
 			hhomogeneous
 			vhomogeneous
 			onDestroy={(self) => self.unparent()}
+			{...props}
 			setup={(self) => {
 				const players = mpris.get_players();
 				players?.forEach((p) => {
@@ -316,11 +368,19 @@ export default function playerStack({ cssName }: { cssName: string }) {
 	windowPlayerStack = theStack;
 
 	const switcher = (
-		<StackSwitcher stack={theStack} cssClasses={["playerswitcher"]} visible={bind(mpris, "players").as((a) => a.length > 1)} halign={CENTER} valign={CENTER} onDestroy={(self) => self.unparent()} />
+		<StackSwitcher
+			stack={theStack}
+			cssClasses={["playerswitcher"]}
+			visible={bind(mpris, "players").as((a) => a.length > 1)}
+			halign={CENTER}
+			valign={CENTER}
+			onDestroy={(self) => self.unparent()}
+			heightRequest={20}
+		/>
 	);
 
 	return (
-		<box halign={CENTER} valign={CENTER} vertical={true} visible={bind(mpris, "players").as((a) => a.length > 0)} onDestroy={(self) => self.unparent()}>
+		<box spacing={20} halign={CENTER} valign={CENTER} vertical={true} visible={bind(mpris, "players").as((a) => a.length > 0)} onDestroy={(self) => self.unparent()}>
 			{switcher}
 			{theStack}
 		</box>
