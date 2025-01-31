@@ -4,32 +4,39 @@ import AstalRiver from "gi://AstalRiver";
 
 const classname = (i: number) => {
 	const river = AstalRiver.River.get_default()!;
-	const output = river.get_output(App.get_monitors()[0].get_model() || "eDP-1");
-	// river.get_output(monitor.get_connector())
+	const output = river!.get_outputs()[0];
 
-	if (output == null) return new Variable("");
-	return Variable.derive([bind(output, "focused_tags"), bind(output, "urgent_tags"), bind(output, "occupied_tags")], (isFocused, isUrgent, isOccupied) => {
-		const classList = ["workspacebutton"];
-		if ((isOccupied & (1 << (i - 1))) !== 0) classList.push("occupied");
-		if ((isFocused & (1 << (i - 1))) !== 0) classList.push("focused");
-		if ((isUrgent & (1 << (i - 1))) !== 0) classList.push("urgent");
-		return classList.join(" ");
-	});
+	return Variable.derive([bind(output, "focused_tags"), bind(output, "urgent_tags"), bind(output, "occupied_tags")], (isFocused, isUrgent, isOccupied) => [
+		"workspacebutton",
+		(isOccupied & (1 << (i - 1))) !== 0 ? "occupied" : "",
+		(isFocused & (1 << (i - 1))) !== 0 ? "focused" : "",
+		(isUrgent & (1 << (i - 1))) !== 0 ? "urgent" : "",
+	]);
 };
 
 const WorkspaceButton = (i: number) => {
 	const river = AstalRiver.River.get_default()!;
-	const output = river.get_output(App.get_monitors()[0].get_model() || "eDP-1");
+	const output = river!.get_outputs()[0];
 
 	return (
 		<button
-			cssClasses={[bind(classname(i)).get()]}
+			cssClasses={bind(classname(i)).as((c) => c)}
 			visible={true}
 			valign={CENTER}
 			halign={CENTER}
-			on_clicked={(_, event) => {
-				if (event.button === Gdk.BUTTON_PRIMARY) output!.focused_tags = 1 << (i - 1);
-				if (event.button === Gdk.BUTTON_SECONDARY) output!.focused_tags ^= 1 << (i - 1);
+			onButtonPressed={(_, event) => {
+				switch (event.get_button()) {
+					case Gdk.BUTTON_PRIMARY:
+						{
+							output.focused_tags = 1 << (i - 1);
+						}
+						break;
+					case Gdk.BUTTON_SECONDARY:
+						{
+							output!.focused_tags ^= 1 << (i - 1);
+						}
+						break;
+				}
 			}}
 		>
 			<label label={`${i}`} halign={CENTER} valign={CENTER} />

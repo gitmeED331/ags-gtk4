@@ -7,9 +7,9 @@ import { theStack, createScrollablePage } from "./Design";
 import Calculator from "./Calculator";
 import { Apps } from "./AppAccess";
 
+const WINDOWNAME = `launcher${App.get_monitors()[0].get_model()}`;
 export let query = new Variable<string>("");
 let currentQuery = "";
-
 
 function Search(query: string) {
 	// const ApplicationElement = (app: AstalApps.Application) => (
@@ -55,37 +55,22 @@ function Search(query: string) {
 	// return results.length > 0;
 }
 
-const handleTerminalCommand = (query: string, state: any) => {
-	const command = query.startsWith("TERM::") ? query.slice(6).trim() : query.trim();
+// const handleCalculatorCommand = (query: string) => {
+// 	const expression = query.startsWith("CALC::") ? query.slice(6).trim() : query.trim();
 
-	if (command) {
-		const isShiftPressed = Gdk.ModifierType.SHIFT_MASK;
-		const cmd = isShiftPressed ? `alacritty --hold -e ${command}` : command;
+// 	if (expression) {
+// 		const existingChild = theStack.get_child_by_name("calculator");
 
-		execAsync(cmd);
+// 		const calculatorPage = <Calculator expression={expression} />;
 
-		entry.set_text("");
-
-		App.toggle_window(`launcher${App.get_monitors()[0].get_model()}`);
-	}
-};
-
-const handleCalculatorCommand = (query: string) => {
-	const expression = query.startsWith("CALC::") ? query.slice(6).trim() : query.trim();
-
-	if (expression) {
-		const existingChild = theStack.get_child_by_name("calculator");
-
-		const calculatorPage = <Calculator expression={expression} />;
-
-		if (!existingChild) {
-			theStack.add_named(calculatorPage, "calculator");
-		}
-		if (theStack.get_visible_child_name() !== "calculator") {
-			theStack.set_visible_child_name("calculator");
-		}
-	}
-};
+// 		if (!existingChild) {
+// 			theStack.add_named(calculatorPage, "calculator");
+// 		}
+// 		if (theStack.get_visible_child_name() !== "calculator") {
+// 			theStack.set_visible_child_name("calculator");
+// 		}
+// 	}
+// };
 
 const entry = (
 	<entry
@@ -94,52 +79,88 @@ const entry = (
 		onChanged={(self) => {
 			const query = self.get_text().trim();
 			const results = Apps.fuzzy_query(query);
-			currentQuery = query;
-			if (query.startsWith("CALC::") || (/^[0-9+\-*/().\s]+$/.test(query) && results.length === 0)) {
-				handleCalculatorCommand(query);
-				if (theStack.get_visible_child_name() !== "calculator") {
+			// currentQuery = query;
+			// if (query.startsWith("CALC::") || (/^[0-9+\-*/().\s]+$/.test(query) && results.length === 0)) {
+			// 	handleCalculatorCommand(query);
+			// 	if (theStack.get_visible_child_name() !== "calculator") {
+			// 		theStack.set_visible_child_name("calculator");
+			// 	}
+			// } else if (!query.startsWith("CALC::")) {
+			if (/^[0-9+\-*/().\s]+$/.test(query) && results.length === 0) {
+				return;
+			} else return Search(query);
+			// }
+		}}
+		onKeyPressed={async (self, keyval, state: Gdk.ModifierType) => {
+			const query = self.get_text().trim();
+			const results = Apps.fuzzy_query(query);
+			try {
+				if (keyval === Gdk.KEY_Return || keyval === Gdk.KEY_KP_Enter) {
+					const isShiftPressed = state && Gdk.ModifierType.SHIFT_MASK;
+					const win = App.get_window(WINDOWNAME);
+					if (isShiftPressed && query) {
+						await execAsync(`ghostty --wait-after-command=true -e ${query}`);
+						self.text = "";
+						win!.visible = false;
+					}
+
+					// if (/^[0-9+\-*/().\s]+$/.test(query) && results.length === 0) {
+					// 	const existingChild = theStack.get_child_by_name("calculator");
+
+					// 	const calculatorPage = <Calculator expression={query} />;
+
+					// 	if (!existingChild) {
+					// 		theStack.add_named(calculatorPage, "calculator");
+					// 	}
+					// 	if (theStack.get_visible_child_name() !== "calculator") {
+					// 		theStack.set_visible_child_name("calculator");
+					// 	}
+					// }
+				}
+			} catch (error) {
+				console.error("Error executing command:", error);
+			}
+			if (keyval === Gdk.KEY_Escape) {
+				self.text = "";
+			}
+		}}
+		onActivate={(self) => {
+			const query = self.get_text().trim();
+			const results = Apps.fuzzy_query(query);
+			const win = App.get_window(WINDOWNAME);
+
+			if (query === "CalcCLEAR") {
+				Calculator({ expression: "CLEAR" });
+				theStack.set_visible_child_name("calculator");
+			}
+			if (/^[0-9+\-*/().\s]+$/.test(query) && results.length === 0) {
+				const existingChild = theStack.get_child_by_name("calculator");
+
+				if (!existingChild) {
+					theStack.add_named(<Calculator expression={query} />, "calculator");
 					theStack.set_visible_child_name("calculator");
 				}
-			} else if (!query.startsWith("TERM::") && !query.startsWith("CALC::")) {
-				Search(query);
+				if (existingChild) {
+					theStack.set_visible_child_name("calculator");
+					Calculator({ expression: query });
+				}
 			}
-		}}
-		onKeyPressed={(_, keyval, state) => {
-			const query = currentQuery.trim();
-			const results = Apps.fuzzy_query(query);
 
-			if (keyval === Gdk.KEY_Return || keyval === Gdk.KEY_KP_Enter) {
-				if ((query.startsWith("TERM::") && results.length === 0) || (results.length === 0 && /^[a-zA-Z0-9_\-]+$/.test(query))) {
-					handleTerminalCommand(query, state);
+			if (results.length >= 1) {
+				if (results[0].name.toLowerCase() === query.toLowerCase()) {
+					results[0].launch();
+					win!.visible = false;
+				} else {
+					execAsync(`fish -ic '${query.replace(/'/g, "\\'")}'`);
 				}
-				if ((query.startsWith("CALC::") && results.length === 0) || (results.length === 0 && /^[0-9+\-*/().\s]+$/.test(query))) {
-					handleCalculatorCommand(query);
-					if (theStack.get_visible_child_name() !== "calculator") {
-						theStack.set_visible_child_name("calculator");
-					}
-				}
-				if (results.length === 1) {
-					const app = results[0];
-					const isShiftPressed = state & Gdk.ModifierType.SHIFT_MASK;
-					if (isShiftPressed) {
-						handleTerminalCommand(query, state);
-					}
-					if (results[0].name.toLowerCase() === query.toLowerCase()) {
-						Apps.fuzzy_query(query)?.[0].launch()
-						
-					}
-				}
+				return;
 			}
-		}}
-		onKeyModifier={(_, keyval) => {
-			const query = currentQuery.trim();
-			const results = Apps.fuzzy_query(query);
 		}}
 		hexpand={true}
 		vexpand={false}
 		halign={FILL}
 		valign={CENTER}
-		tooltip_text={"Search applications, or use TERM:: for terminal commands, CALC:: for calculator"}
+		tooltip_text={"Search apps, calculator, terminal commands"}
 		activates_default={true}
 		focusOnClick={true}
 		primary_icon_name={Icon.launcher.search}

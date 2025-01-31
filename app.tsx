@@ -7,9 +7,7 @@ import csshotreload from "./cssHotLoad";
 
 // GLib.setenv("LD_PRELOAD", "", true);
 
-csshotreload;
-
-// App.add_icons(`${GLib.get_user_data_dir()}/icons/Astal`);
+csshotreload();
 
 // import {
 // 	Bar,
@@ -23,10 +21,27 @@ csshotreload;
 // } from "./modules/Windows/index";
 
 import windows from "./modules/Windows/index";
+import { DashPop } from "./modules/Windows/bar/Bar";
 
 // const monitorID = Gdk.Display.get_default()!.get_n_monitors() - 1
 
 App.start({
+	icons: `${GLib.get_user_data_dir()}/icons/Astal/`,
+	main() {
+		for (const monitor of App.get_monitors()) {
+			windows.forEach((window) => window(monitor));
+			// Bar(monitor);
+			// cliphist(monitor);
+			// Dashboard(monitor);
+			// // Launcherflowbox(monitor);
+			// Launchergrid(monitor);
+			// MediaPlayerWindow();
+			// NotificationPopups(monitor);
+			// sessioncontrol(monitor);
+			// SystemStats(monitor);
+			// wallpapers(monitor);
+		}
+	},
 	requestHandler(request: string, res: (response: any) => void) {
 		for (const monitor of App.get_monitors()) {
 			if (request == "cliphist") {
@@ -53,48 +68,42 @@ App.start({
 				const win = App.get_window(`sessioncontrols${monitor.get_model()}`);
 				if (win && win.visible) {
 					win.visible = false;
-					res("Showing sessioncontrol");
+					res("Hiding sessioncontrol");
 				} else if (win && !win.visible) {
 					win.visible = true;
-					res("Hiding sessioncontrol");
+					res("Showing sessioncontrol");
 				}
 			}
 			if (request == "systemstats") {
 				const win = App.get_window(`systemstats${monitor.get_model()}`);
 				if (win && win.visible) {
 					win.visible = false;
-					res("Showing systemstats");
+
+					res("Hiding systemstats");
 				} else if (win && !win.visible) {
 					win.visible = true;
-					res("Hiding systemstats");
+					res("Showing systemstats");
 				}
 			}
 			if (request == "launcher") {
 				const win = App.get_window(`launcher${monitor.get_model()}`);
 				if (win && win.visible) {
 					win.visible = false;
-					res("Showing Launcher");
+					res("Hiding Launcher");
 				} else if (win && !win.visible) {
 					win.visible = true;
-					res("Hiding Launcher");
+					res("Showing Launcher");
 				}
 			}
-		}
-	},
-	icons: `${GLib.get_user_data_dir()}/icons/Astal/`,
-	main() {
-		for (const monitor of App.get_monitors()) {
-			windows.forEach((window) => window(monitor));
-			// Bar(monitor);
-			// cliphist(monitor);
-			// Dashboard(monitor);
-			// // Launcherflowbox(monitor);
-			// Launchergrid(monitor);
-			// MediaPlayerWindow();
-			// NotificationPopups(monitor);
-			// sessioncontrol(monitor);
-			// SystemStats(monitor);
-			// wallpapers(monitor);
+			if (request == "dashboard") {
+				if (DashPop && DashPop.visible) {
+					DashPop.visible = false;
+					res("Hiding Launcher");
+				} else if (DashPop && !DashPop.visible) {
+					DashPop.visible = true;
+					res("Showing Dashboard");
+				}
+			}
 		}
 	},
 });

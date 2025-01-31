@@ -1,7 +1,7 @@
 import { Astal, Gtk, Gdk, App, Widget } from "astal/gtk4";
 import { bind, Binding, exec, execAsync, Variable } from "astal";
 import Mpris from "gi://AstalMpris";
-import { Grid, StackSwitcher, Stack } from "../Astalified/index";
+import { Grid, StackSwitcher, Stack, Notebook } from "../Astalified/index";
 import Icon from "../lib/icons";
 import TrimTrackTitle from "../lib/TrimTrackTitle";
 import Pango from "gi://Pango";
@@ -11,8 +11,8 @@ function Player(player: Mpris.Player) {
 	const TrackInfo = ({ info }: { info: "tracks" | "artists" }) => {
 		const Bindings = Variable.derive([bind(player, "title"), bind(player, "artist")], (title, artist) => ({
 			classname: {
-				tracks: "tracktitle",
-				artists: "artist",
+				tracks: [`${player.entry}-tracktitle`],
+				artists: [`${player.entry}-artist`],
 			}[info],
 
 			maxwidthchars: {
@@ -30,7 +30,7 @@ function Player(player: Mpris.Player) {
 			// <box cssClasses={"trackinfo"} valign={CENTER} halign={CENTER} hexpand={true} vertical={true} spacing={5}>
 
 			<label
-				cssClasses={[Bindings.as((b) => b.classname).get()]}
+				cssClasses={bind(Bindings).as((b) => b.classname)}
 				wrap={false}
 				hexpand={true}
 				halign={CENTER}
@@ -38,59 +38,41 @@ function Player(player: Mpris.Player) {
 				maxWidthChars={Bindings.as((b) => b.maxwidthchars)}
 				label={Bindings.as((b) => b.label)}
 				setup={() => {
-					const generateAccentCss = (color: string): string => {
-						if (!color || !color.trim()) {
-							return "color: #ffffff;";
-						}
-						return `color: ${color};`; // The semicolon will be added when the CSS is applied
+					const getColorFromArt = async (coverArt: string, colorCount: number, bgColor: string) => {
+						if (!coverArt) return "#ffffff";
+
+						const bgColorRgb = await execAsync(`bash -c 'magick convert xc:"${bgColor}" -format "%[fx:mean*100]" info:'`);
+						const bgBrightness = parseFloat(bgColorRgb);
+
+						const modulation = bgBrightness < 50 ? 150 : 50;
+
+						return await execAsync(`bash -c "magick '${coverArt}' -modulate ${modulation},100,100 -colors ${colorCount} -quantize RGB -unique-colors txt:- | awk '{ print \\$3 }' | tail -n 1"`);
 					};
 
-					const extractColor = async (cover_art: string, colors: number): Promise<string> => {
-						return await execAsync(`bash -c "magick ${cover_art} -colors ${colors} -quantize RGB -unique-colors txt:- | awk '{ print $3 }' | tail -n 1"`);
-					};
-
-					const trackCss = async (cover_art: string): Promise<string> => {
-						if (cover_art) {
-							const color = await extractColor(cover_art, 3);
-							return generateAccentCss(color);
-						}
-						return "color: #ffffff;";
-					};
-
-					const artistCss = async (cover_art: string): Promise<string> => {
-						if (cover_art) {
-							const color = await extractColor(cover_art, 4);
-							return generateAccentCss(color);
-						}
-						return "color: #ffffff;";
-					};
-
-					const updateColors = () => {
+					const updateColors = async () => {
 						const coverArt = player.cover_art || "";
 
-						if (!coverArt) {
-							App.apply_css(`.player .tracktitle { color: #ffffff; }`);
-							App.apply_css(`.player .artist { color: #ffffff; }`);
-							return;
-						}
+						try {
+							const bgColor = await execAsync(`bash -c "magick '${coverArt}' -alpha off -crop 5%x100%0+0+0 -colors 1 -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
 
-						trackCss(coverArt).then((col) => {
-							if (col && col.trim()) {
-								App.apply_css(`.player .tracktitle { ${col} }`, false); // Added semicolon
+							if (!coverArt) {
+								App.apply_css(`.${player.entry}-tracktitle { color: #ff8c00; }`);
+								App.apply_css(`.${player.entry}-artist { color: #0f9bff; }`);
+								return;
 							}
-						});
-						artistCss(coverArt).then((col) => {
-							if (col && col.trim()) {
-								App.apply_css(`.player .artist { ${col} }`, false); // Added semicolon
-							}
-						});
+
+							const trackColor = await getColorFromArt(coverArt, 2, bgColor);
+							const artistColor = await getColorFromArt(coverArt, 6, bgColor);
+
+							App.apply_css(`.${player.entry}-tracktitle { color: ${trackColor}; }`);
+							App.apply_css(`.${player.entry}-artist { color: ${artistColor}; }`);
+						} catch (error) {
+							console.error("Error updating colors:", error);
+						}
 					};
 
 					updateColors();
-
-					player.connect("notify::cover-art", () => {
-						updateColors();
-					});
+					player.connect("notify::cover-art", updateColors);
 				}}
 			/>
 		);
@@ -245,20 +227,16 @@ function Player(player: Mpris.Player) {
 			vexpand={true}
 			visible={true}
 			rowSpacing={10}
+			onDestroy={(self) => {
+				self.unparent();
+			}}
 			setup={(self) => {
 				self.attach(<TrackInfo info="tracks" />, 0, 0, 1, 1);
 				self.attach(<TrackInfo info="artists" />, 0, 1, 1, 1);
 				self.attach(<Controls btn="activePlay" />, 1, 1, 1, 1);
 				self.attach(TrackPosition(), 0, 2, 2, 1);
 				self.attach(
-					<centerbox
-						cssClasses={["playercontrols"]}
-						vexpand={false}
-						hexpand={false}
-						halign={CENTER}
-						valign={CENTER}
-						// spacing={20}
-					>
+					<centerbox cssClasses={["playercontrols"]} vexpand={false} hexpand={false} halign={CENTER} valign={CENTER}>
 						<Controls btn="previous" />
 						<Controls btn="play_pause" />
 						<Controls btn="next" />
@@ -274,7 +252,7 @@ function Player(player: Mpris.Player) {
 
 	return (
 		<box
-			cssClasses={["player"]}
+			cssClasses={["player", player.entry]}
 			name={player.entry}
 			vertical={false}
 			hexpand={true}
@@ -284,31 +262,26 @@ function Player(player: Mpris.Player) {
 			onDestroy={(self) => {
 				self.unparent();
 			}}
-			setup={() => {
-				const generateBackgroundCss = (bg: string, color: string): string =>
-					`background-image: radial-gradient(circle at left, rgba(0, 0, 0, 0), ${color} 12rem), url('file://${bg}');` +
-					`background-position: left top, left top;` +
-					`background-size: contain;` +
-					`transition: all 0.7s ease;` +
-					`background-repeat: no-repeat;`;
+			setup={(self) => {
+				const CoverArtCss = async (coverArt: string): Promise<string> => {
+					if (!coverArt) return "background-color: #0e0e1e;";
 
-				const extractColor = async (cover_art: string, colors: number): Promise<string> => {
-					return await execAsync(`bash -c "magick ${cover_art} -alpha off -crop 5%x100%0+0+0 -colors ${colors} -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
+					const color = await execAsync(`bash -c "magick '${coverArt}' -alpha off -crop 5%x100%0+0+0 -colors 1 -unique-colors txt: | head -n2 | tail -n1 | cut -f4 -d' '"`);
+
+					return `background-image: radial-gradient(circle at left, rgba(0, 0, 0, 0), ${color} 12rem), url('file://${coverArt}');
+           background-position: left top, left top;
+           background-size: contain;
+           transition: all 0.7s ease;
+           background-repeat: no-repeat;`;
 				};
 
-				const CoverArtCss = async (cover_art: string): Promise<string> => {
-					if (cover_art) {
-						const color = await extractColor(cover_art, 1);
-						return generateBackgroundCss(cover_art, color);
-					}
-					return "background-color: #0e0e1e;";
+				const applyCA = async () => {
+					const CoverArt = player.cover_art || "";
+					CoverArtCss(CoverArt).then((css) => {
+						App.apply_css(`.${player.entry} { ${css} }`, false);
+					});
 				};
-
-				const coverArt = player.cover_art || "";
-
-				CoverArtCss(coverArt).then((css) => {
-					App.apply_css(`.player { ${css} }`, false);
-				});
+				player.connect("notify::cover-art", applyCA);
 			}}
 		>
 			{mediaInfoGrid}
@@ -331,7 +304,9 @@ export default function playerStack({ custCSS, ...props }: { custCSS: string[] }
 			transition_duration={2000}
 			hhomogeneous
 			vhomogeneous
-			onDestroy={(self) => self.unparent()}
+			onDestroy={(self) => {
+				self.unparent();
+			}}
 			{...props}
 			setup={(self) => {
 				const players = mpris.get_players();

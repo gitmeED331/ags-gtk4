@@ -1,6 +1,7 @@
 import { Astal, App, Gtk, Gdk, Widget } from "astal/gtk4";
 import { bind, GLib, GObject, exec, execAsync, Gio } from "astal";
 import AstalNotifd from "gi://AstalNotifd";
+import AstalCava from "gi://AstalCava";
 
 // ----- Widgets -----
 import DateTimeLabel from "../../lib/datetime";
@@ -9,6 +10,7 @@ import MediaTickerButton from "./MediaTicker";
 import Dashboard from "../../Widgets/dashboard/dashboard";
 import { notifCounter } from "../../Widgets/Notification";
 import { Separator } from "../../Astalified/index";
+import { GraphBadge } from "../../lib/badge-widgets";
 
 const wm = GLib.getenv("XDG_CURRENT_DESKTOP")?.toLowerCase();
 
@@ -17,7 +19,7 @@ function LeftBar({ ...props }: Widget.BoxProps) {
 		<box
 			cssClasses={["left"]}
 			halign={START}
-			valign={START}
+			valign={FILL}
 			spacing={5}
 			{...props}
 			setup={async (self) => {
@@ -44,6 +46,11 @@ function LeftBar({ ...props }: Widget.BoxProps) {
 	);
 }
 
+export const DashPop = (
+	<popover position={Gtk.PositionType.BOTTOM} hasArrow>
+		<Dashboard />
+	</popover>
+);
 function CenterBar({ ...props }: Widget.MenuButtonProps) {
 	const notifd = AstalNotifd.get_default();
 
@@ -98,22 +105,20 @@ function CenterBar({ ...props }: Widget.MenuButtonProps) {
 	};
 
 	return (
-		<menubutton halign={CENTER} valign={START} {...props}>
+		<menubutton halign={CENTER} valign={FILL} {...props}>
 			<centerbox cssClasses={["center", "clock"]} halign={FILL} valign={START}>
 				<StartWid />
 				<CenterWid />
 				<EndWid />
 			</centerbox>
-			<popover name={"dashpop"} position={Gtk.PositionType.BOTTOM} hasArrow>
-				<Dashboard />
-			</popover>
+			{DashPop}
 		</menubutton>
 	);
 }
 
 function RightBar({ ...props }: Widget.BoxProps) {
 	return (
-		<box cssClasses={["right"]} halign={END} valign={START} spacing={5} {...props}>
+		<box cssClasses={["right"]} halign={END} valign={FILL} spacing={5} {...props}>
 			<MediaTickerButton />
 			<SysInfo />
 		</box>
@@ -121,10 +126,13 @@ function RightBar({ ...props }: Widget.BoxProps) {
 }
 
 export default function (monitor: Gdk.Monitor) {
+	const cava = AstalCava.get_default()!;
+	cava.bars = 16;
+
 	return (
 		<window
-			cssClasses={["barwindow"]}
 			name={`bar${monitor.get_model()}`}
+			cssClasses={["barwindow"]}
 			gdkmonitor={monitor}
 			application={App}
 			anchor={TOP | LEFT | RIGHT}
@@ -132,13 +140,17 @@ export default function (monitor: Gdk.Monitor) {
 			layer={Astal.Layer.TOP}
 			visible={true}
 			halign={FILL}
-			valign={START}
+			valign={FILL}
+			// defaultWidth={0}
+			defaultHeight={1}
 		>
-			<centerbox cssClasses={["bar"]} valign={START} halign={FILL} shrinkCenterLast>
-				<LeftBar />
-				<CenterBar />
-				<RightBar />
-			</centerbox>
+			<GraphBadge values={bind(cava, "values")}>
+				<centerbox cssClasses={["bar"]} valign={START} halign={FILL} shrinkCenterLast>
+					<LeftBar halign={START} />
+					<CenterBar halign={CENTER} />
+					<RightBar halign={END} />
+				</centerbox>
+			</GraphBadge>
 		</window>
 	);
 }

@@ -47,7 +47,28 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 		</box>
 	);
 
-	const notifBody = <label cssClasses={["body"]} label={n.body} maxWidthChars={40} lines={4} wrap wrapMode={Pango.WrapMode.WORD} ellipsize={Pango.EllipsizeMode.END} halign={START} valign={START} />;
+	interface notifBodyProps {
+		label: string;
+		lines: number;
+		useMarkup?: boolean;
+		cssClasses?: string[];
+	}
+	const notifBody = (props: notifBodyProps) => {
+		props.label = props.label.replaceAll("\n", "\u2028")
+		return (
+		<label 
+		cssClasses={props.cssClasses}
+		{...props} 
+		maxWidthChars={40} 
+		lines={props.lines} 
+		wrap
+		wrapMode={Pango.WrapMode.WORD}
+		ellipsize={Pango.EllipsizeMode.END}
+		halign={START}
+		valign={START}
+		/>
+		)
+	};
 
 	const notifActions = (
 		<box cssClasses={["actions"]} valign={END} halign={FILL}>
@@ -58,6 +79,9 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 						n.dismiss();
 					}}
 					hexpand={true}
+					setup={(self) => {
+						self.cursor = Gdk.Cursor.new_from_name("pointer", null);
+					}}
 				>
 					<label label={action.label} />
 				</button>
@@ -78,7 +102,7 @@ export default function NotifWidget({ n, ...boxprops }: { n: AstalNotifd.Notific
 				setup={(self) => {
 					self.attach(iconDateTime, 0, 0, 1, 3);
 					self.attach(notifTitle, 1, 0, 1, 1);
-					self.attach(notifBody, 1, 1, 1, 1);
+					self.attach(notifBody({ label: n.body, lines: 4,cssClasses: ["body"] }), 1, 1, 1, 1);
 					self.attach(notifActions, 1, 2, 1, 1);
 				}}
 			/>

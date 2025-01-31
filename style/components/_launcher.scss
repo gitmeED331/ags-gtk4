@@ -5,24 +5,22 @@
 		// all: unset;
 		padding-right: 1rem;
 		min-width: 30rem;
-		/* background: $PrimaryBG; */
 		border-radius: $radius-tbleft;
 		border: $border;
 		border-left: none;
-
-		// box-shadow: 0rem 0rem 2rem 2rem rgba(15, 155, 255, 0.8);
+		/* box-shadow: 0rem 0rem 2rem 2rem rgba(15, 155, 255, 0.8); */
 	}
 
-	&.contentgrid,
-	.grid {
+	.contentgrid {
 		border-radius: $radius-tbright;
 		border: $border;
 		border-left: none;
-		/* min-width: 15rem; */
-		/* min-height: 25rem; */
 		padding-bottom: 0.5rem;
-		// border-bottom: none;
-		// box-shadow: 0rem 0rem 2rem 2rem rgba(15, 155, 255, 0.8);
+		box-shadow: 0rem 0rem 2rem 2rem rgba(15, 155, 255, 0.8);
+		background-color: rgba(0, 0, 0, 1);
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
 	}
 
 	&.search {
@@ -59,7 +57,7 @@
 	}
 
 	&.app {
-		all: unset;
+		/* all: unset; */
 		padding: 0 0.75rem;
 		min-width: 7rem;
 		min-height: 3rem;

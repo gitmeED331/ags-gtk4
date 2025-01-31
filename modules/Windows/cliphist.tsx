@@ -1,4 +1,4 @@
-import { Astal, Gtk, Gdk, App } from "astal/gtk4";
+import { hook, Astal, Gtk, Gdk, App } from "astal/gtk4";
 import { execAsync, exec, Variable, bind } from "astal";
 import Pango from "gi://Pango";
 import { Grid } from "../Astalified/index";
@@ -7,7 +7,8 @@ import Icon from "../lib/icons";
 import ClickToClose from "../lib/ClickToClose";
 import PopupWindow from "../lib/popupwindow";
 
-const background = `${SRC}/assets/groot-thin-left.png`;
+const BACKGROUND = `${SRC}/style/assets/groot-thin-left.png`;
+
 const WINDOWNAME = `cliphist${App.get_monitors()[0].get_model()}`;
 
 function ClipHistItem(entry: any) {
@@ -109,6 +110,9 @@ const scrollableList = (<box vertical />) as Gtk.Box;
 
 await updateList(scrollableList);
 function ClipHistWidget() {
+	// const cssprovider = new Gtk.CssProvider();
+	// const css = Variable<string>("");
+
 	const header = () => {
 		const clear = (
 			<image
@@ -165,15 +169,14 @@ function ClipHistWidget() {
 						1,
 						1,
 					);
+					// css.set(`background-image: url("file://${BACKGROUND}");`);
 
-					App.apply_css(`
-						.contentgrid {
-						background-image: url("file://${background}");
-						background-size: contain;
-						background-repeat: no-repeat;
-						background-position: center;
-						background-color: rgba(0, 0, 0, 1);
-					}`);
+					// self.get_style_context().add_provider(cssprovider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+					// hook(self, css(), () => {
+					// 	cssprovider.load_from_string(`.cliphist.contentgrid { ${css().get()} }`);
+					// });
+
+					App.apply_css(`.cliphist.contentgrid {background-image: url("file://${BACKGROUND}");}`, false);
 				}}
 			/>
 		</box>

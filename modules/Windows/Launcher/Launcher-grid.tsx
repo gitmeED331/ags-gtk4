@@ -1,4 +1,5 @@
-import { Astal, Gtk, Gdk, App } from "astal/gtk4";
+import { hook, Astal, Gtk, Gdk, App } from "astal/gtk4";
+import { Variable } from "astal";
 import AstalApps from "gi://AstalApps";
 import { Grid } from "../../Astalified/index";
 import FavoritesBar from "./FavoritesBar";
@@ -9,7 +10,7 @@ import { Applications } from "./AppAccess";
 import SessionControls, { SysBtn } from "../../Widgets/SessionControls";
 import ScreenSizing from "../../lib/screensizeadjust";
 
-const background = `${SRC}/assets/groot-thin-right.png`;
+const BACKGROUND = `${SRC}/style/assets/groot-thin-right.png`;
 
 const favorites = Applications.filter((app) => ["Zed", "Windsurf", "deezer-enhanced", "Floorp", "KeePassXC"].includes(app.get_name())).sort((a, b) => a.get_name().localeCompare(b.get_name()));
 
@@ -27,10 +28,12 @@ const SessCon = (
 
 export default function Launchergrid(monitor: Gdk.Monitor) {
 	const WINDOWNAME = `launcher${monitor.get_model()}`;
+	// const cssprovider = new Gtk.CssProvider();
+	// const css = Variable<string>("");
 
 	const contentGrid = (
 		<Grid
-			cssClasses={["launcher", "contentgrid"]}
+			cssClasses={["contentgrid"]}
 			halign={FILL}
 			valign={FILL}
 			hexpand={true}
@@ -46,13 +49,14 @@ export default function Launchergrid(monitor: Gdk.Monitor) {
 				self.attach(theStack, 1, 2, 1, 2);
 				self.attach(<SessionControls size={15} vertical cssClasses={["sessioncontrols", "launcher", "pbox"]} />, 0, 3, 1, 1);
 
-				App.apply_css(`.launcher.contentgrid {
-						background-image: url("file://${background}");
-						background-color: rgba(0, 0, 0, 1);
-						background-size: contain;
-						background-position: center;
-						background-repeat: no-repeat;
-						}`);
+				// css.set(`background-image: url("file://${BACKGROUND}");`);
+
+				// self.get_style_context().add_provider(cssprovider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION);
+				// hook(self, css(), () => {
+				// 	cssprovider.load_from_string(`.launcher.contentgrid { ${css().get()} }`);
+				// });
+
+				App.apply_css(`.launcher.contentgrid {background-image: url("file://${BACKGROUND}");}`, false);
 			}}
 		/>
 	);
@@ -82,14 +86,14 @@ export default function Launchergrid(monitor: Gdk.Monitor) {
 	return (
 		<window
 			name={WINDOWNAME}
-			cssClasses={["launcher", "window"]}
+			cssClasses={["launcher"]}
 			gdkmonitor={monitor}
+			application={App}
 			anchor={TOP | BOTTOM | LEFT | RIGHT}
 			layer={Astal.Layer.OVERLAY}
 			exclusivity={Astal.Exclusivity.NORMAL}
 			keymode={Astal.Keymode.ON_DEMAND}
 			visible={false}
-			application={App}
 			onKeyPressed={(_, keyval) => {
 				const win = App.get_window(WINDOWNAME);
 				if (win && keyval === Gdk.KEY_Escape) {
@@ -113,7 +117,7 @@ export default function Launchergrid(monitor: Gdk.Monitor) {
 				// }}
 			>
 				{contentGrid}
-				<ClickToClose id={0} width={0.8} height={0.85} windowName={WINDOWNAME} />
+				<ClickToClose id={0} width={0.75} height={0.85} windowName={WINDOWNAME} />
 			</box>
 		</window>
 	);

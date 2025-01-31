@@ -6,6 +6,7 @@ import entry, { query } from "./search";
 import ScreenSizing from "../../lib/screensizeadjust";
 import { Apps, Applications, AstalApplication } from "./AppAccess";
 import Pango from "gi://Pango";
+import Calculator from "./Calculator";
 
 const WINDOWNAME = `launcher${App.get_monitors()[0].get_model()}`;
 
@@ -29,7 +30,7 @@ export function CreateAppGrid({ appList }: { appList: AstalApplication[] }) {
 	);
 
 	function createAppButton(app: AstalApplication) {
-		const command = (win: any) => [app.launch(), (win.visible = !win.visible)];
+		const command = (win: any) => [app.launch(), win.set_visible(!win.visible)];
 
 		return (
 			<button

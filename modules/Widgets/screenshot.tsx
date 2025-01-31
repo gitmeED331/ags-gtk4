@@ -36,10 +36,11 @@ function Buttons() {
 				shot: {
 					area: async () => {
 						const filePath = `$HOME/Pictures/Screenshots/Screenshot-area_$(date '+%y-%m-%d_%H%M%S').png`;
-						await executeCommand(`grim -g "$(slurp)" "${filePath}"`, "Screenshot Taken", "Screenshot of the selected area was saved", filePath, false);
+						await executeCommand(`grim -g "$(slurp)" "${filePath}"`, "Screenshot Taken", "Screenshot of the selected area was saved.", filePath, false);
 					},
 					full: async () => {
-						await executeCommand(`grim - | wl-copy`, "Screenshot Copied", "The fullscreen screenshot was copied to the clipboard", undefined, false);
+						const filePath = `$HOME/Pictures/Screenshots/Screenshot-full_$(date '+%y-%m-%d_%H%M%S').png`;
+						await executeCommand(`grim "${filePath}"`, "Screenshot Taken", "The fullscreen screenshot was saved.", undefined, false);
 					},
 				},
 				record: {

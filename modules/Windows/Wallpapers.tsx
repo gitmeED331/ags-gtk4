@@ -209,14 +209,14 @@ export default async function (monitor: Gdk.Monitor) {
 	return (
 		<window
 			name={WINDOWNAME}
-			cssClasses={["wallpaper", "window"]}
+			cssClasses={["wallpaper"]}
 			gdkmonitor={monitor}
+			application={App}
 			anchor={TOP | BOTTOM | LEFT | RIGHT}
 			layer={Astal.Layer.OVERLAY}
 			exclusivity={Astal.Exclusivity.NORMAL}
 			keymode={Astal.Keymode.EXCLUSIVE}
 			visible={false}
-			application={App}
 			onKeyReleased={(_, keyval) => {
 				const win = App.get_window(WINDOWNAME);
 				if (win && win.visible && keyval === Gdk.KEY_Escape) {

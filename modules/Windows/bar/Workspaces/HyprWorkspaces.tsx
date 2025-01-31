@@ -67,7 +67,7 @@ export default function Workspaces() {
 	const workspaceButtons = [...Array(10).keys()].map((id) => workspaceButton(id + 1));
 
 	return (
-		<box cssClasses={["hyprworkspaces"]} halign={CENTER} valign={CENTER} hexpand={true}>
+		<box cssClasses={["hyprworkspaces"]} halign={CENTER} valign={FILL} hexpand={true}>
 			{workspaceButtons.map((button, index) => button)}
 		</box>
 	);

@@ -8,7 +8,7 @@ import PlayerStack from "../../Widgets/MediaPlayer";
 import LeftSide from "./LeftSide";
 import RightSide from "./RightSide";
 
-export default function Dashboard() {
+export default function () {
 	return (
 		<Grid
 			cssClasses={["dashboard", "grid"]}

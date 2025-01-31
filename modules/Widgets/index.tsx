@@ -14,6 +14,7 @@ import SessionControls from "./SessionControls";
 import SRIndicate from "./screenshot";
 import Tray from "./Tray";
 import SystemTray from "./tray2";
+import SystemUpdates from "./SystemUpdates";
 import VolumeIndicator from "./VolumeIndicator";
 import Wifi from "./Network/WiFi";
 
@@ -35,5 +36,6 @@ export {
 	SessionControls,
 	SRIndicate,
 	SystemTray,
+	SystemUpdates,
 	Tray,
 };

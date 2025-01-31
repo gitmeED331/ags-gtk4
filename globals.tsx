@@ -1,6 +1,8 @@
 import { Astal, Gtk } from "astal/gtk4";
+import { Gio } from "astal";
 
 declare global {
+	
 	// Alignments
 	const START: number;
 	const CENTER: number;
@@ -29,6 +31,7 @@ declare global {
 }
 
 Object.assign(globalThis, {
+	
 	// Alignments
 	START: Gtk.Align.START,
 	CENTER: Gtk.Align.CENTER,

@@ -5,7 +5,7 @@ import FlowBoxChild from "./FlowboxChild";
 import Grid from "./Grid";
 import ListBox from "./Listbox";
 import ListBoxRow from "./ListBoxRow";
-// import Notebook from "./NoteBook";
+import Notebook from "./NoteBook";
 import RegularWindow from "./RegularWindow";
 // import SearchEntry from "./SearchEntry";
 import ScrolledWindow from "./Scrollable";
@@ -24,7 +24,7 @@ export {
 	Grid,
 	ListBox,
 	ListBoxRow,
-	// Notebook,
+	Notebook,
 	RegularWindow,
 	// SearchEntry,
 	ScrolledWindow,

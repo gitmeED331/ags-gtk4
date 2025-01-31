@@ -5,17 +5,16 @@
 		-gtk-icon-transform: rotate(1turn);
 	}
 }
-.barwindow {
-	all: unset;
-}
+
 window.bar {
+	all: unset;
 	color: $color7;
 	background: none;
 
 	.left,
 	.center,
 	.right {
-		min-width: 1rem;
+		min-width: 0.1rem;
 	}
 }
 
@@ -24,7 +23,7 @@ window.bar {
 	background: $PrimaryBG;
 	border-radius: 1rem;
 	border-top: $border;
-	/* min-width: 50px; */
+	min-width: 1rem;
 	padding: 0 0.5rem;
 
 	image {
@@ -107,4 +106,28 @@ window.bar {
 			color: $color5;
 		}
 	} */
+	
+}
+.sysupdates {
+	padding: 0rem 0.25rem;
+	&:hover {
+		color: $color5;
+		
+	}
+	&-tooltip {
+		font-size: 1rem;
+		.header {
+			color: $color1;
+			font-weight: bold;
+		}
+		.pac {
+			color: $color6;
+		}
+		.aur {
+			color: $color2;
+		}
+		.values {
+			color: $color3;
+		}
+	}
 }

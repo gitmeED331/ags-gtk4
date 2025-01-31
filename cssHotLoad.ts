@@ -2,7 +2,7 @@ import { App } from "astal/gtk4";
 import { execAsync, monitorFile } from "astal";
 
 /* CSS Hot Reload */
-async function monitorStyle() {
+export default async function () {
 	const pathsToMonitor = [`${SRC}/style/globals`, `${SRC}/style/components`, `${SRC}/style/_variables.scss`]; // Paths to monitor
 
 	const mainScss = `${SRC}/style/main.scss`; // SCSS input file to compile
@@ -30,5 +30,3 @@ async function monitorStyle() {
 
 	return transpileAndApply();
 }
-
-export default monitorStyle();

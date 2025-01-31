@@ -43,9 +43,7 @@ calendar {
 		.other-month {
 			color: $color7;
 		}
-		&:selected {
-			color: black;
-		}
+
 		.today {
 			background: radial-gradient(rgba(0, 0, 0, 1) 25%, rgba(15, 155, 255, 1) 100%);
 			border-radius: $radius;
@@ -69,8 +67,8 @@ calendar {
 	color: $color1;
 	/* background: $BGG5; */
 	border-radius: $radius;
-	min-width: 50px;
-	min-height: 30px;
+	min-width: 30px;
+	min-height: 20px;
 	padding: 0.25rem 0.5rem;
 
 	image {

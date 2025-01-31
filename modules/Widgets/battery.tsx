@@ -105,6 +105,7 @@ export default function () {
 			}}
 			setup={(self) => {
 				popped.set_parent(self);
+				self.cursor = Gdk.Cursor.new_from_name("pointer", null);
 			}}
 			overflow={Gtk.Overflow.HIDDEN}
 		>

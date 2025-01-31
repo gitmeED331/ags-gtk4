@@ -22,7 +22,7 @@
 	.occupied {
 		image,
 		label {
-			color: rgba(15, 155, 255, 1);
+			color: $color5;
 		}
 	}
 
@@ -31,28 +31,39 @@
 	}
 
 	.focused {
-		all: unset;
-		color: $color3;
-		padding: 0.1rem 0.25rem;
-		border-radius: 2rem;
-		border: 1px solid $color2;
-		transition: all 2s ease;
-
 		@each $workspace in hyprworkspaces, riverworkspaces {
-			@if $workspace ==hyprworkspaces {
+			@if $workspace == hyprworkspaces {
+				all: unset;
+				color: $color3;
+				border-radius: 2rem;
+				border: 1px solid $color2;
+				transition: all 2s ease;
+				padding: 0.1rem 0.25rem;
 				background-image: radial-gradient(circle at center, rgba(0, 0, 0, 1), $color1 1.5rem);
-			} @else if $workspace ==riverworkspaces {
-				border-bottom: 1px solid $color2;
+			}
+			@if $workspace == riverworkspaces {
+				all: unset;
+				color: $color3;
+				border-radius: 2rem;
+				transition: all 2s ease;
+				padding: 0.1rem;
+				padding-bottom: unset;
+				border-bottom: 1px solid $color3;
 			}
 		}
 	}
 
 	button {
 		color: $color1;
-		/* transition: all 2s cubic-bezier(0.5, 2, /0, 1); */
 
 		label {
-			font-size: 0.6rem;
+			@each $workspace in hyprworkspaces, riverworkspaces {
+				@if $workspace == hyprworkspaces {
+					font-size: 0.6rem;
+				} @else if $workspace == riverworkspaces {
+					font-size: 0.9rem;
+				}
+			}
 		}
 
 		&:first-child {

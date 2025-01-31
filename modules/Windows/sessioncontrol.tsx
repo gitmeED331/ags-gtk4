@@ -48,14 +48,14 @@ export default (monitor: Gdk.Monitor) => {
 	return (
 		<window
 			name={WINDOWNAME}
-			cssClasses={["sessioncontrols", "window"]}
+			cssClasses={["sessioncontrols"]}
 			gdkmonitor={monitor}
+			application={App}
 			anchor={TOP | BOTTOM | LEFT | RIGHT}
 			layer={Astal.Layer.OVERLAY}
 			exclusivity={Astal.Exclusivity.IGNORE}
 			keymode={Astal.Keymode.EXCLUSIVE}
 			visible={false}
-			application={App}
 			// halign={FILL}
 			// valign={FILL}
 			onKeyPressed={(_, keyval) => {

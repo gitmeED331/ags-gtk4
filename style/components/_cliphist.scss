@@ -1,13 +1,14 @@
 @use "../_variables" as *;
 
 .cliphist {
-	&.contentgrid {
-		background: $GrootRightBG black center no-repeat;
-		background-size: auto auto;
+	.contentgrid {
+		background-color: rgba(0, 0, 0, 1);
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
 		border-radius: $radius-tbleft;
 		border: $border;
 		border-right: none;
-		// box-shadow: 1rem 0.5rem 0.5rem -0.25rem rgba(15, 155, 255, 0.8);
 		box-shadow: 0rem 0rem 2rem 2rem rgba(15, 155, 255, 0.8);
 		padding: 0 1rem;
 	}
